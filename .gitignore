@@ -1,0 +1,13 @@
+# Dependências
+node_modules/
+# Build
+dist/
+build/
+# SO / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+# Env
+.env
+.env.local
