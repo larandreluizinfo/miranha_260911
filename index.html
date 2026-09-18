@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>miranha_260911 — Fazenda Pós-Apocalíptica: 5 Fases</title>
+<title>Fazenda Apocalíptica — Leon K. vs Zumbis + Surf Music</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { width:100%; height:100%; overflow:hidden; background:#0d0906;
@@ -24,12 +24,15 @@
     justify-content:center; z-index:10; background:rgba(5,3,2,.72);
     backdrop-filter:blur(3px); }
   #overlay.hidden { display:none; }
-  .card { max-width:560px; width:92%; background:linear-gradient(180deg,#1d130c,#100b07);
+  .card { max-width:600px; width:92%; background:linear-gradient(180deg,#1d130c,#100b07);
     border:1px solid #ff963c55; border-radius:16px; padding:28px; text-align:center;
-    color:#ffe6c4; box-shadow:0 20px 80px #000; }
-  .card h1 { font-size:30px; margin-bottom:8px; color:#ffb14e; }
+    color:#ffe6c4; box-shadow:0 20px 80px #000; max-height:92vh; overflow:auto; }
+  .card h1 { font-size:28px; margin-bottom:8px; color:#ffb14e; }
   .card h2 { font-size:22px; margin-bottom:8px; color:#ffb14e; }
   .card p { font-size:15px; line-height:1.55; color:#e8c9a0; margin:8px 0; }
+  .leon-badge { display:inline-block; background:#1c3a5e; border:1px solid #6ea8ff;
+    color:#cfe4ff; padding:6px 14px; border-radius:999px; font-size:13px;
+    font-weight:700; margin-bottom:6px; letter-spacing:.5px; }
   .keys { display:inline-block; text-align:left; margin:10px auto; font-size:14px;
     background:#00000055; padding:12px 16px; border-radius:10px; border:1px solid #ffffff18; }
   .keys b { color:#ffd166; }
@@ -42,6 +45,12 @@
     font-weight:700; z-index:6; display:none; border:1px solid #ffd16655; }
   #dmgflash { position:fixed; inset:0; pointer-events:none; z-index:7; opacity:0;
     background:radial-gradient(ellipse at center, transparent 55%, rgba(255,0,0,.55) 100%); }
+  #musicBtn { position:fixed; bottom:16px; right:16px; z-index:8;
+    background:rgba(10,8,5,.8); border:1px solid #4ecdc4; color:#a8fff8;
+    padding:10px 16px; border-radius:999px; font-size:13px; font-weight:700;
+    cursor:pointer; }
+  #musicBtn:hover { background:#123b38; }
+  #musicBtn.off { border-color:#666; color:#999; }
 </style>
 </head>
 <body>
@@ -53,22 +62,28 @@
   <div class="pill">ABATES <span id="hKills">0</span></div>
   <div class="pill">VIDA <span id="hpbar"><span id="hpfill"></span></span></div>
   <div class="pill">ARMA <span id="hArma">PISTOLA</span></div>
+  <div class="pill">LEON K. ★</div>
 </div>
 <div id="toast"></div>
 <div id="dmgflash"></div>
+<button id="musicBtn">♪ SURF MUSIC: ON</button>
 
 <div id="overlay">
   <div class="card" id="cardMenu">
-    <h1>FAZENDA PÓS-APOCALÍPTICA</h1>
-    <p>Sobreviva às <b>5 fases</b> de zumbis na fazenda abandonada.</p>
+    <div class="leon-badge">★ PROTAGONISTA: LEON K. — lendário sobrevivente ★</div>
+    <h1>FAZENDA APOCALÍPTICA</h1>
+    <p>Zumbis tomaram a fazenda! Você é <b>Leon K.</b>, jaqueta marrom, cabelo estiloso,
+    armado com <b>pistola</b> e <b>faca de combate</b>. Sobreviva às <b>5 fases</b>.</p>
     <div class="keys">
       <div><b>WASD / Setas</b> — mover</div>
       <div><b>Mouse</b> — mirar &nbsp;•&nbsp; <b>Clique esquerdo</b> — atirar pistola</div>
-      <div><b>F</b> ou <b>botão direito</b> — facada (curta distância, dano alto)</div>
+      <div><b>F</b> ou <b>botão direito</b> — facada (perto, dano alto)</div>
+      <div><b>M</b> — ligar/desligar música surf</div>
       <div><b>R</b> — reiniciar após morte/vitória</div>
     </div>
-    <p>+30 de vida a cada fase vencida. Cuidado com os <b>corredores</b> e os <b>brutamontes</b>!</p>
-    <button id="btnStart">COMEÇAR</button>
+    <p>♪ Trilha <b>surf rock original</b> estilo Super Surf (guitarra com reverb + bateria) — feita aqui mesmo no jogo, sem arquivo externo!</p>
+    <p>+30 de vida a cada fase. Cuidado com os <b>corredores</b> e os <b>brutamontes</b>!</p>
+    <button id="btnStart">COMEÇAR A MISSÃO</button>
   </div>
 </div>
 
@@ -87,6 +102,7 @@ const cardMenu = document.getElementById('cardMenu');
 const btnStart = document.getElementById('btnStart');
 const toast = document.getElementById('toast');
 const dmgflash = document.getElementById('dmgflash');
+const musicBtn = document.getElementById('musicBtn');
 
 let W = 0, H = 0, DPR = 1;
 function resize() {
@@ -97,17 +113,22 @@ function resize() {
 }
 window.addEventListener('resize', resize); resize();
 
-// ---------- Áudio simples ----------
+// ---------- Áudio SFX ----------
 let AC = null;
+function audio() {
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
 function beep(freq, dur, type, vol) {
   try {
-    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
-    const o = AC.createOscillator(), g = AC.createGain();
+    const ac = audio();
+    const o = ac.createOscillator(), g = ac.createGain();
     o.type = type || 'square'; o.frequency.value = freq;
     g.gain.value = vol || 0.06;
-    o.connect(g); g.connect(AC.destination);
-    o.start(); g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + (dur || 0.08));
-    o.stop(AC.currentTime + (dur || 0.08));
+    o.connect(g); g.connect(ac.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + (dur || 0.08));
+    o.stop(ac.currentTime + (dur || 0.08));
   } catch (e) {}
 }
 const sfxShoot = () => beep(700 + Math.random()*300, 0.07, 'square', 0.05);
@@ -115,6 +136,114 @@ const sfxKnife = () => beep(220, 0.1, 'sawtooth', 0.07);
 const sfxHit   = () => beep(140, 0.1, 'sawtooth', 0.08);
 const sfxDie   = () => beep(90, 0.25, 'sawtooth', 0.09);
 const sfxHurt  = () => beep(180, 0.2, 'square', 0.09);
+
+// ---------- MÚSICA SURF ROCK ORIGINAL (estilo Super Surf, sem copyright) ----------
+let musicOn = true, musicTimer = null, step = 0, nextTime = 0;
+const BPM = 168, SPB = 60 / BPM / 2; // colcheias
+// Progressão surf: E | E | A | B7 (original, cativante)
+const BASSLINE = [82.4,82.4,82.4,82.4, 82.4,82.4,110,110, 82.4,82.4,98,98, 123.5,123.5,98,98];
+// Melodia principal surf (original, com reverb de mola simulado)
+const LEAD = [
+  659,0,659,784, 0,659,0,494,
+  587,0,587,659, 0,587,494,0,
+  659,0,659,784, 880,784,659,587,
+  494,0,587,659, 587,494,82.4,0
+];
+function noiseBurst(t, dur, vol, freq) {
+  const ac = audio();
+  const len = Math.floor(ac.sampleRate * dur);
+  const buf = ac.createBuffer(1, len, ac.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+  const src = ac.createBufferSource(); src.buffer = buf;
+  const f = ac.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = freq || 1000;
+  const g = ac.createGain(); g.gain.value = vol;
+  src.connect(f); f.connect(g); g.connect(musicBus);
+  src.start(t);
+}
+let musicBus = null, delaySend = null;
+function initMusicBus() {
+  const ac = audio();
+  if (musicBus) return;
+  musicBus = ac.createGain(); musicBus.gain.value = 0.5;
+  // reverb de mola fake: delay curto com feedback
+  const delay = ac.createDelay(1); delay.delayTime.value = 0.23;
+  const fb = ac.createGain(); fb.gain.value = 0.32;
+  const wet = ac.createGain(); wet.gain.value = 0.35;
+  delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(ac.destination);
+  delaySend = ac.createGain(); delaySend.gain.value = 1;
+  delaySend.connect(ac.destination); delaySend.connect(delay);
+  musicBus.connect(delaySend);
+}
+function playNote(t, freq, dur, type, vol) {
+  if (!freq) return;
+  const ac = audio();
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.value = freq;
+  // vibrato surf
+  const lfo = ac.createOscillator(); lfo.frequency.value = 6;
+  const lg = ac.createGain(); lg.gain.value = 6;
+  lfo.connect(lg); lg.connect(o.frequency);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.connect(g); g.connect(musicBus);
+  o.start(t); o.stop(t + dur + 0.02);
+  lfo.start(t); lfo.stop(t + dur + 0.02);
+}
+function scheduleStep(s, t) {
+  const i = s % 16;
+  // bateria surf: bumbo 1 e 3, caixa 2 e 4, chimbal direto
+  const bar = Math.floor(s / 16) % 4;
+  const pos = s % 4;
+  if (pos === 0 || pos === 2) { // kick
+    const ac = audio();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(120, t);
+    o.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+    g.gain.setValueAtTime(0.5, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+    o.connect(g); g.connect(musicBus); o.start(t); o.stop(t + 0.16);
+  }
+  if (pos === 1 || pos === 3) noiseBurst(t, 0.12, 0.35, 1800); // caixa
+  noiseBurst(t, 0.03, 0.08, 6000); // chimbal
+  // baixo
+  playNote(t, BASSLINE[i], 0.22, 'triangle', 0.28);
+  // base palhetada
+  if (s % 2 === 0) playNote(t, BASSLINE[i]*2, 0.1, 'square', 0.06);
+  // solo surf (só a cada 2 compassos cheios p/ não enjoar, sempre toca)
+  playNote(t, LEAD[s % LEAD.length], 0.21, 'square', 0.11);
+}
+function scheduler() {
+  if (!musicOn) return;
+  const ac = audio();
+  while (nextTime < ac.currentTime + 0.25) {
+    scheduleStep(step, nextTime);
+    nextTime += SPB;
+    step++;
+  }
+}
+function startMusic() {
+  try {
+    initMusicBus();
+    audio();
+    if (musicTimer) clearInterval(musicTimer);
+    step = 0; nextTime = audio().currentTime + 0.1;
+    musicTimer = setInterval(scheduler, 80);
+    musicBtn.textContent = '♪ SURF MUSIC: ON';
+    musicBtn.classList.remove('off');
+  } catch(e){}
+}
+function stopMusic() {
+  if (musicTimer) clearInterval(musicTimer);
+  musicTimer = null;
+  musicBtn.textContent = '♪ SURF MUSIC: OFF';
+  musicBtn.classList.add('off');
+}
+function toggleMusic() {
+  musicOn = !musicOn;
+  if (musicOn) startMusic(); else stopMusic();
+}
+musicBtn.onclick = toggleMusic;
 
 // ---------- Estado ----------
 const FASES = [
@@ -130,18 +259,18 @@ const ZSTATS = {
   brute:  { hp: 10,speed: 40,  dmg: 22, r: 27, cor: '#8a6f5c', escuro: '#4a382c' },
 };
 
-let state = 'menu'; // menu | playing | phaseclear | gameover | victory
+let state = 'menu';
 let player, bullets, zombies, parts, embers;
 let fase = 0, spawned = 0, kills = 0, killsFase = 0;
-let spawnTimer = 0, lastHurt = -99, elapsed = 0;
+let spawnTimer = 0, elapsed = 0;
 let mouse = { x: innerWidth/2, y: innerHeight/2, down: false };
 let keys = {};
 let shootCd = 0, knifeCd = 0, knifeAnim = 0;
-let clearTimer = 0;
+let clearTimer = 0, walkPhase = 0;
 
 function resetPlayer() {
   player = { x: W/2, y: H*0.62, hp: 100, maxHp: 100, speed: 250,
-             ang: -Math.PI/2, r: 16, lastDmg: -99 };
+             ang: -Math.PI/2, r: 16, moving: false };
 }
 function startGame() {
   resetPlayer(); bullets = []; zombies = []; parts = []; embers = [];
@@ -149,6 +278,7 @@ function startGame() {
     s: 1+Math.random()*2.5, v: 12+Math.random()*30, o: Math.random()*Math.PI*2 });
   fase = 0; kills = 0; elapsed = 0;
   overlay.classList.add('hidden');
+  if (musicOn) startMusic();
   startPhase(1);
 }
 function startPhase(n) {
@@ -156,7 +286,7 @@ function startPhase(n) {
   spawnTimer = 0.4;
   if (n > 1) player.hp = Math.min(player.maxHp, player.hp + 30);
   state = 'playing';
-  showToast('FASE ' + n + ' — sobrevivam ' + FASES[n-1].total + ' zumbis!');
+  showToast('FASE ' + n + ' — Leon, limpe ' + FASES[n-1].total + ' zumbis!');
   updateHUD();
 }
 function showToast(msg, ms) {
@@ -165,7 +295,7 @@ function showToast(msg, ms) {
   showToast._t = setTimeout(() => toast.style.display = 'none', ms || 2600);
 }
 function endCard(titulo, texto, btn) {
-  cardMenu.innerHTML = '<h2>' + titulo + '</h2><p>' + texto + '</p>' +
+  cardMenu.innerHTML = '<div class="leon-badge">★ LEON K. ★</div><h2>' + titulo + '</h2><p>' + texto + '</p>' +
     '<button id="btnAgain">' + btn + '</button><p style="font-size:13px">ou pressione R</p>';
   overlay.classList.remove('hidden');
   document.getElementById('btnAgain').onclick = startGame;
@@ -200,10 +330,12 @@ function updateHUD() {
 // ---------- Combate ----------
 function shoot() {
   const a = player.ang;
-  const gx = player.x + Math.cos(a)*26, gy = player.y + Math.sin(a)*26;
+  const gx = player.x + Math.cos(a)*30, gy = player.y + Math.sin(a)*30;
   bullets.push({ x: gx, y: gy, vx: Math.cos(a)*760, vy: Math.sin(a)*760,
                  life: 1.1, r: 4 });
   sfxShoot();
+  // clarão do tiro
+  player.muzzle = 0.06;
   for (let i = 0; i < 4; i++)
     parts.push({ x: gx, y: gy, vx: (Math.random()-.5)*160, vy: (Math.random()-.5)*160,
                  life: .25, max: .25, cor: '#ffcf6e', r: 2 });
@@ -213,7 +345,7 @@ function knife() {
   knifeCd = 0.5; knifeAnim = 0.22; hArma.textContent = 'FACA!';
   setTimeout(() => hArma.textContent = 'PISTOLA', 350);
   sfxKnife();
-  const alcance = 105, arco = 1.0;
+  const alcance = 110, arco = 1.0;
   let acertou = false;
   for (const z of zombies) {
     const dx = z.x - player.x, dy = z.y - player.y;
@@ -229,7 +361,6 @@ function knife() {
       else sfxHit();
     }
   }
-  // poeira do golpe mesmo sem acerto
   for (let i = 0; i < 8; i++) {
     const a = player.ang + (Math.random()-.5)*1.6;
     parts.push({ x: player.x + Math.cos(a)*60, y: player.y + Math.sin(a)*60,
@@ -254,23 +385,24 @@ function matar(z) {
 function update(dt) {
   elapsed += dt;
   shootCd -= dt; knifeCd -= dt; knifeAnim -= dt;
+  if (player.muzzle > 0) player.muzzle -= dt;
 
-  // movimento
   let mx = 0, my = 0;
   if (keys['w'] || keys['arrowup']) my -= 1;
   if (keys['s'] || keys['arrowdown']) my += 1;
   if (keys['a'] || keys['arrowleft']) mx -= 1;
   if (keys['d'] || keys['arrowright']) mx += 1;
+  player.moving = !!(mx || my);
   if (mx || my) {
     const l = Math.hypot(mx, my); mx/=l; my/=l;
     player.x = Math.max(20, Math.min(W-20, player.x + mx*player.speed*dt));
     player.y = Math.max(90, Math.min(H-20, player.y + my*player.speed*dt));
+    walkPhase += dt * 10;
   }
   player.ang = Math.atan2(mouse.y - player.y, mouse.x - player.x);
 
   if (mouse.down && shootCd <= 0 && state === 'playing') { shoot(); shootCd = 0.21; }
 
-  // spawn por fase
   const cfg = FASES[fase-1];
   if (state === 'playing') {
     spawnTimer -= dt;
@@ -281,7 +413,7 @@ function update(dt) {
     if (spawned >= cfg.total && vivos === 0) {
       if (fase >= 5) {
         state = 'victory';
-        endCard('VITÓRIA! 🏆', 'Você limpou as 5 fases da fazenda com ' + kills + ' zumbis abatidos.', 'JOGAR DE NOVO');
+        endCard('VITÓRIA! 🏆', 'Leon limpou as 5 fases da fazenda com ' + kills + ' zumbis abatidos. Surf no pôr do sol apocalíptico!', 'JOGAR DE NOVO');
       } else {
         state = 'phaseclear'; clearTimer = 3;
         showToast('FASE ' + fase + ' COMPLETA! +30 vida', 2800);
@@ -295,7 +427,6 @@ function update(dt) {
     if (clearTimer <= 0) startPhase(fase + 1);
   }
 
-  // balas
   for (let i = bullets.length-1; i >= 0; i--) {
     const b = bullets[i];
     b.x += b.vx*dt; b.y += b.vy*dt; b.life -= dt;
@@ -315,7 +446,6 @@ function update(dt) {
   }
   zombies = zombies.filter(z => !z.morto);
 
-  // zumbis perseguem
   for (const z of zombies) {
     z.hitCd -= dt; z.wob += dt*z.wobV;
     const dx = player.x - z.x, dy = player.y - z.y;
@@ -325,16 +455,14 @@ function update(dt) {
     const vx = (nx*Math.cos(wob) - ny*Math.sin(wob))*z.speed;
     const vy = (nx*Math.sin(wob) + ny*Math.cos(wob))*z.speed;
     z.x += vx*dt; z.y += vy*dt;
-    // separação simples
     for (const o of zombies) {
       if (o === z || o.morto) continue;
       const sx = z.x-o.x, sy = z.y-o.y, sd = Math.hypot(sx, sy);
       if (sd > 0 && sd < z.r+o.r) { z.x += sx/sd*22*dt; z.y += sy/sd*22*dt; }
     }
-    // dano no jogador
     if (d < z.r + player.r + 4 && z.hitCd <= 0 && state === 'playing') {
       z.hitCd = 0.9;
-      player.hp -= z.dmg; player.lastDmg = elapsed;
+      player.hp -= z.dmg;
       sfxHurt();
       dmgflash.style.opacity = 1;
       setTimeout(() => dmgflash.style.opacity = 0, 180);
@@ -342,12 +470,11 @@ function update(dt) {
       updateHUD();
       if (player.hp <= 0) {
         player.hp = 0; state = 'gameover'; updateHUD();
-        endCard('VOCÊ MORREU ☠', 'Chegou até a fase ' + fase + ' com ' + kills + ' abates.', 'TENTAR DE NOVO');
+        endCard('VOCÊ MORREU ☠', 'Leon caiu na fase ' + fase + ' com ' + kills + ' abates.', 'TENTAR DE NOVO');
       }
     }
   }
 
-  // partículas
   for (let i = parts.length-1; i >= 0; i--) {
     const p = parts[i];
     p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= .92; p.vy *= .92; p.life -= dt;
@@ -362,20 +489,17 @@ function update(dt) {
 
 // ---------- Desenho: fazenda pós-apocalíptica ----------
 function drawBackground(t) {
-  // céu
   const ceu = ctx.createLinearGradient(0, 0, 0, H*0.65);
   ceu.addColorStop(0, '#0b0705'); ceu.addColorStop(0.45, '#3a1c0d');
   ceu.addColorStop(0.75, '#7a3a12'); ceu.addColorStop(1, '#a8541c');
   ctx.fillStyle = ceu; ctx.fillRect(0, 0, W, H*0.66);
 
-  // sol pálido
   const sx = W*0.72, sy = H*0.24;
   const glow = ctx.createRadialGradient(sx, sy, 10, sx, sy, 130);
   glow.addColorStop(0, 'rgba(255,200,120,.9)'); glow.addColorStop(1, 'rgba(255,120,40,0)');
   ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(sx, sy, 130, 0, 7); ctx.fill();
   ctx.fillStyle = '#f7d9a8'; ctx.beginPath(); ctx.arc(sx, sy, 34, 0, 7); ctx.fill();
 
-  // fumaça/nuvens
   ctx.fillStyle = 'rgba(20,12,8,.55)';
   for (let i = 0; i < 7; i++) {
     const cx = ((i*W/6) + t*12*(1+i*0.2)) % (W+300) - 150;
@@ -383,31 +507,27 @@ function drawBackground(t) {
     ctx.beginPath(); ctx.ellipse(cx, cy, 120+((i*37)%60), 22+(i%3)*8, 0, 0, 7); ctx.fill();
   }
 
-  // colinas
   ctx.fillStyle = '#241209';
   ctx.beginPath(); ctx.moveTo(0, H*0.52);
   for (let x = 0; x <= W; x += 40) ctx.lineTo(x, H*0.52 - Math.sin(x*0.01)*22 - 10);
   ctx.lineTo(W, H*0.66); ctx.lineTo(0, H*0.66); ctx.fill();
 
-  // celeiro em ruínas
   const bx = W*0.07, by = H*0.30, bw = Math.min(220, W*0.2), bh = 130;
   ctx.fillStyle = '#4a2a16'; ctx.fillRect(bx, by, bw, bh);
   ctx.fillStyle = '#2c170b';
   ctx.beginPath(); ctx.moveTo(bx-12, by); ctx.lineTo(bx+bw*0.4, by-56);
   ctx.lineTo(bx+bw*0.62, by-20); ctx.lineTo(bx+bw, by); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#160c06'; // buraco no telhado
+  ctx.fillStyle = '#160c06';
   ctx.beginPath(); ctx.moveTo(bx+bw*0.4, by-56); ctx.lineTo(bx+bw*0.62, by-20);
   ctx.lineTo(bx+bw*0.5, by-8); ctx.closePath(); ctx.fill();
   ctx.fillStyle = '#120a05'; ctx.fillRect(bx+bw*0.32, by+bh*0.3, bw*0.36, bh*0.7);
   ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 2;
   for (let i = 1; i < 5; i++) { ctx.beginPath();
     ctx.moveTo(bx, by+i*bh/5); ctx.lineTo(bx+bw, by+i*bh/5); ctx.stroke(); }
-  // fogo dentro do celeiro
   const fl = 0.6 + Math.sin(t*9)*0.3;
   ctx.fillStyle = 'rgba(255,' + Math.floor(90+60*fl) + ',20,.85)';
   ctx.beginPath(); ctx.ellipse(bx+bw*0.5, by+bh*0.86, 16*fl+8, 10, 0, 0, 7); ctx.fill();
 
-  // silo quebrado
   const gx = W*0.86, gy = H*0.28, gw = 64, gh = 170;
   ctx.save(); ctx.translate(gx, gy); ctx.rotate(0.09);
   ctx.fillStyle = '#5c6066'; ctx.fillRect(-gw/2, 0, gw, gh);
@@ -418,7 +538,6 @@ function drawBackground(t) {
   ctx.beginPath(); ctx.ellipse(4, 70, 14, 20, 0.3, 0, 7); ctx.fill();
   ctx.restore();
 
-  // moinho quebrado
   const mx = W*0.30, my = H*0.44;
   ctx.strokeStyle = '#1d130c'; ctx.lineWidth = 6;
   ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx+8, my-110); ctx.stroke();
@@ -428,24 +547,20 @@ function drawBackground(t) {
   ctx.setLineDash([6,5]); ctx.beginPath();
   ctx.moveTo(mx+8, my-110); ctx.lineTo(mx+30, my-150); ctx.stroke(); ctx.setLineDash([]);
 
-  // árvores mortas
   function arvore(x, y, s) {
     ctx.strokeStyle = '#140d08'; ctx.lineWidth = 5*s; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x+4*s, y-60*s); ctx.stroke();
     ctx.lineWidth = 3*s;
     ctx.beginPath(); ctx.moveTo(x+4*s, y-60*s); ctx.lineTo(x-24*s, y-92*s); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x+4*s, y-60*s); ctx.lineTo(x+30*s, y-84*s); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x-24*s, y-92*s); ctx.lineTo(x-34*s, y-108*s); ctx.stroke();
   }
   arvore(W*0.48, H*0.52, 1); arvore(W*0.62, H*0.55, 0.7); arvore(W*0.16, H*0.56, 0.85);
 
-  // chão
   const chao = ctx.createLinearGradient(0, H*0.5, 0, H);
   chao.addColorStop(0, '#3a2412'); chao.addColorStop(0.4, '#2a1a0d');
   chao.addColorStop(1, '#120b06');
   ctx.fillStyle = chao; ctx.fillRect(0, H*0.5, W, H*0.5);
 
-  // rachaduras
   ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 2;
   for (let i = 0; i < 8; i++) {
     const cx0 = (i*197) % W, cy0 = H*0.62 + (i*53) % (H*0.3);
@@ -453,7 +568,6 @@ function drawBackground(t) {
     ctx.lineTo(cx0+40, cy0+8); ctx.lineTo(cx0+70, cy0-6); ctx.lineTo(cx0+110, cy0+10);
     ctx.stroke();
   }
-  // capim morto
   ctx.strokeStyle = '#6b5a2e'; ctx.lineWidth = 2;
   for (let i = 0; i < 40; i++) {
     const px = (i*173.3) % W, py = H*0.58 + (i*97) % (H*0.36);
@@ -461,7 +575,6 @@ function drawBackground(t) {
     ctx.moveTo(px, py); ctx.lineTo(px+3, py-14); ctx.stroke();
   }
 
-  // trator destruído
   const tx = W*0.55, ty = H*0.72;
   ctx.fillStyle = '#3f4a1e'; ctx.fillRect(tx, ty-34, 120, 34);
   ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(tx+26, ty+6, 22, 0, 7); ctx.fill();
@@ -469,7 +582,6 @@ function drawBackground(t) {
   ctx.strokeStyle = '#111'; ctx.lineWidth = 5;
   ctx.beginPath(); ctx.moveTo(tx+30, ty-34); ctx.lineTo(tx+62, ty-70); ctx.stroke();
 
-  // cerca quebrada
   const fy = H*0.56;
   ctx.fillStyle = '#2e1c0e';
   for (let x = 0; x < W; x += 90) {
@@ -482,58 +594,120 @@ function drawBackground(t) {
   for (let x = 0; x <= W; x += 90) ctx.lineTo(x, fy-38+Math.sin(x)*3);
   ctx.stroke();
 
-  // brasas flutuantes
   for (const e of embers) {
     ctx.fillStyle = 'rgba(255,' + Math.floor(120+Math.random()*80) + ',40,.8)';
     ctx.beginPath(); ctx.arc(e.x, e.y, e.s, 0, 7); ctx.fill();
   }
 
-  // névoa
   const nevoa = ctx.createLinearGradient(0, H*0.5, 0, H*0.8);
   nevoa.addColorStop(0, 'rgba(160,140,120,0)'); nevoa.addColorStop(1, 'rgba(160,140,120,.14)');
   ctx.fillStyle = nevoa; ctx.fillRect(0, H*0.4, W, H*0.6);
 
-  // vinheta
   const vg = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.35, W/2, H/2, Math.max(W,H)*0.75);
   vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.55)');
   ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
 }
 
+// ---------- LEON K. — inspirado em Leon S. Kennedy (RE) ----------
 function drawPlayer(t) {
   const p = player;
   ctx.save(); ctx.translate(p.x, p.y);
-  // sombra
   ctx.fillStyle = 'rgba(0,0,0,.45)';
-  ctx.beginPath(); ctx.ellipse(0, 12, 16, 7, 0, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, 14, 17, 7, 0, 0, 7); ctx.fill();
+
+  // pernas (animação andar)
+  const lp = p.moving ? Math.sin(walkPhase) * 6 : 0;
+  ctx.fillStyle = '#2b2f36';
+  ctx.fillRect(-9, 2 + lp*0.4, 7, 12);
+  ctx.fillRect(2, 2 - lp*0.4, 7, 12);
+  ctx.fillStyle = '#111';
+  ctx.fillRect(-9, 12 + lp*0.4, 7, 5);
+  ctx.fillRect(2, 12 - lp*0.4, 7, 5);
+
   const a = p.ang;
-  // corpo
-  ctx.fillStyle = '#2e4a68'; ctx.beginPath(); ctx.arc(0, 0, p.r, 0, 7); ctx.fill();
-  ctx.fillStyle = '#1d2f45'; ctx.beginPath(); ctx.arc(0, 0, p.r-5, 0, 7); ctx.fill();
-  // cabeça/capacete
-  ctx.fillStyle = '#e0b48a'; ctx.beginPath(); ctx.arc(0, 0, 7, 0, 7); ctx.fill();
-  // arma
-  ctx.rotate(a);
-  ctx.fillStyle = '#151515'; ctx.fillRect(8, -3.5, 22, 7);
-  ctx.fillStyle = '#888'; ctx.fillRect(26, -2, 5, 4);
-  // mãos
-  ctx.fillStyle = '#e0b48a'; ctx.beginPath(); ctx.arc(14, 0, 4, 0, 7); ctx.fill();
+  // corpo é desenhado rotacionado p/ frente = mira
+  ctx.save(); ctx.rotate(a + Math.PI/2);
+
+  // jaqueta marrom do Leon (RE4)
+  ctx.fillStyle = '#6b4a2f';
+  ctx.beginPath(); ctx.ellipse(0, 0, 15, 17, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = '#7d5a3a';
+  ctx.beginPath(); ctx.ellipse(-4, -2, 7, 12, 0.2, 0, 7); ctx.fill();
+  // camisa preta + coldre
+  ctx.fillStyle = '#15181d';
+  ctx.fillRect(-4, -14, 8, 26);
+  ctx.fillStyle = '#0c0e11';
+  ctx.fillRect(-9, 2, 18, 4); // cinto
+  ctx.fillStyle = '#c9a227';
+  ctx.fillRect(-2, 2, 4, 4); // fivela
+  // ombreiras / gola
+  ctx.fillStyle = '#4a3220';
+  ctx.beginPath(); ctx.moveTo(-12, -10); ctx.lineTo(-5, -16); ctx.lineTo(-5, -8); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(12, -10); ctx.lineTo(5, -16); ctx.lineTo(5, -8); ctx.closePath(); ctx.fill();
+  // patch R.P.D. azul no ombro
+  ctx.fillStyle = '#1c3a5e';
+  ctx.beginPath(); ctx.arc(11, 2, 4.5, 0, 7); ctx.fill();
+  ctx.fillStyle = '#cfe4ff'; ctx.font = 'bold 4px Arial'; ctx.textAlign = 'center';
+  ctx.fillText('RPD', 11, 3.5);
+
+  // cabeça: pele + cabelo castanho estilo Leon
+  ctx.fillStyle = '#e8b88a';
+  ctx.beginPath(); ctx.arc(0, -22, 9, 0, 7); ctx.fill();
+  // cabelo (franja lateral característica)
+  ctx.fillStyle = '#3a2a1c';
+  ctx.beginPath(); ctx.arc(0, -24, 9.5, Math.PI*0.9, Math.PI*2.1); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-9, -24); ctx.lineTo(-11, -16); ctx.lineTo(-6, -20); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(9, -24); ctx.lineTo(11, -16); ctx.lineTo(6, -20); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#2c2015';
+  ctx.beginPath(); ctx.ellipse(-2, -27, 7, 3.5, -0.3, 0, 7); ctx.fill();
+
+  // BRAÇO DIREITO: pistola
+  ctx.save(); ctx.translate(10, -4); ctx.rotate(0.15);
+  ctx.fillStyle = '#7d5a3a'; ctx.fillRect(0, -3, 14, 6); // manga
+  ctx.fillStyle = '#e8b88a'; ctx.beginPath(); ctx.arc(15, 0, 3.5, 0, 7); ctx.fill();
+  ctx.fillStyle = '#181818'; ctx.fillRect(14, -2.5, 20, 5); // pistola
+  ctx.fillStyle = '#9aa0a8'; ctx.fillRect(28, -1.5, 6, 3); // cano
+  ctx.fillStyle = '#333'; ctx.fillRect(17, 2, 4, 6); // empunhadura
+  // clarão do tiro
+  if (p.muzzle > 0) {
+    ctx.fillStyle = 'rgba(255,220,120,.95)';
+    ctx.beginPath(); ctx.moveTo(34, 0); ctx.lineTo(46, -6); ctx.lineTo(46, 6); ctx.closePath(); ctx.fill();
+  }
   ctx.restore();
 
-  // arco da faca
+  // BRAÇO ESQUERDO: faca de combate
+  const knifeOut = knifeAnim > 0 ? 1 : 0;
+  ctx.save(); ctx.translate(-10, -2); ctx.rotate(-0.25 - knifeOut*0.5);
+  ctx.fillStyle = '#6b4a2f'; ctx.fillRect(-12, -3, 12, 6);
+  ctx.fillStyle = '#e8b88a'; ctx.beginPath(); ctx.arc(-13, 0, 3.5, 0, 7); ctx.fill();
+  ctx.fillStyle = '#5a3a22'; ctx.fillRect(-20, -2, 7, 4); // cabo
+  ctx.fillStyle = knifeOut ? '#ffffff' : '#c8ccd2'; // lâmina
+  ctx.beginPath(); ctx.moveTo(-20, -2.5); ctx.lineTo(-34, -1); ctx.lineTo(-34, 1); ctx.lineTo(-20, 2.5); ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  ctx.restore(); // fim do corpo rotacionado
+  ctx.restore();
+
+  // arco da facada
   if (knifeAnim > 0) {
     ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang);
     ctx.strokeStyle = 'rgba(255,255,255,' + (knifeAnim/0.22) + ')';
     ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.arc(0, 0, 70, -0.9, 0.9); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, 72, -0.9, 0.9); ctx.stroke();
     ctx.strokeStyle = 'rgba(255,220,150,' + (knifeAnim/0.22*0.7) + ')';
-    ctx.lineWidth = 10;
+    ctx.lineWidth = 11;
     ctx.beginPath(); ctx.arc(0, 0, 62, -0.8, 0.8); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.font = 'bold 13px Arial'; ctx.textAlign = 'center';
+    ctx.fillText('FACA!', 0, -80);
     ctx.restore();
   }
-  // barra de vida sobre o jogador
-  ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(p.x-22, p.y-34, 44, 6);
+  // nome + vida
+  ctx.fillStyle = 'rgba(0,0,0,.65)'; ctx.fillRect(p.x-30, p.y-46, 60, 8);
   ctx.fillStyle = p.hp > 40 ? '#5dd35d' : '#ff4b4b';
-  ctx.fillRect(p.x-21, p.y-33, 42*Math.max(0,p.hp)/100, 4);
+  ctx.fillRect(p.x-29, p.y-45, 58*Math.max(0,p.hp)/100, 6);
+  ctx.fillStyle = '#cfe4ff'; ctx.font = 'bold 10px Arial'; ctx.textAlign = 'center';
+  ctx.fillText('LEON K.', p.x, p.y-50);
 }
 
 function drawZombies(t) {
@@ -543,30 +717,26 @@ function drawZombies(t) {
     ctx.fillStyle = 'rgba(0,0,0,.4)';
     ctx.beginPath(); ctx.ellipse(0, z.r*0.7, z.r, z.r*0.4, 0, 0, 7); ctx.fill();
     const bal = Math.sin(z.wob)*3;
-    // corpo
     ctx.fillStyle = st.cor;
     ctx.beginPath(); ctx.arc(bal*0.3, 0, z.r, 0, 7); ctx.fill();
     ctx.fillStyle = st.escuro;
     ctx.beginPath(); ctx.arc(bal*0.3, 0, z.r-5 < 5 ? 5 : z.r-5, 0, 7); ctx.fill();
-    // olhos vermelhos
     const da = Math.atan2(player.y - z.y, player.x - z.x);
     ctx.rotate(da);
     ctx.fillStyle = '#ff2222';
     ctx.beginPath(); ctx.arc(z.r*0.4, -5, 3, 0, 7); ctx.fill();
     ctx.beginPath(); ctx.arc(z.r*0.4, 5, 3, 0, 7); ctx.fill();
-    // braços
     ctx.strokeStyle = st.cor; ctx.lineWidth = 5; ctx.lineCap = 'round';
     const reach = 6 + Math.sin(z.wob*1.4)*4;
     ctx.beginPath(); ctx.moveTo(4, -z.r*0.6); ctx.lineTo(z.r+reach, -z.r*0.6); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(4, z.r*0.6); ctx.lineTo(z.r+reach, z.r*0.6); ctx.stroke();
-    if (z.tipo === 'brute') { // espinhos
+    if (z.tipo === 'brute') {
       ctx.fillStyle = '#3a2c22';
       for (let s = -1; s <= 1; s++) {
         ctx.beginPath(); ctx.arc(-6, s*10, 4, 0, 7); ctx.fill();
       }
     }
     ctx.restore();
-    // vida
     if (z.hp < z.maxHp) {
       ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(z.x-18, z.y-z.r-12, 36, 5);
       ctx.fillStyle = '#ff5b5b'; ctx.fillRect(z.x-17, z.y-z.r-11, 34*(z.hp/z.maxHp), 3);
@@ -577,14 +747,12 @@ function drawZombies(t) {
 function draw() {
   const t = elapsed;
   drawBackground(t);
-  // balas
   for (const b of bullets) {
     ctx.fillStyle = '#ffe27a';
     ctx.beginPath(); ctx.arc(b.x, b.y, b.r+2, 0, 7); ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill();
   }
-  // partículas de sangue
   for (const p of parts) {
     ctx.globalAlpha = Math.max(0, p.life/p.max);
     ctx.fillStyle = p.cor;
@@ -593,7 +761,6 @@ function draw() {
   ctx.globalAlpha = 1;
   if (player && state !== 'menu') drawZombies(t);
   if (player && state !== 'menu') drawPlayer(t);
-  // mira
   if (state === 'playing' || state === 'phaseclear') {
     ctx.strokeStyle = '#ffcf6e'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 12, 0, 7); ctx.stroke();
@@ -606,7 +773,6 @@ function draw() {
   }
 }
 
-// ---------- Loop ----------
 let last = performance.now();
 function loop(now) {
   const dt = Math.min(0.05, (now - last)/1000); last = now;
@@ -621,11 +787,11 @@ for (let i = 0; i < 70; i++) embers.push({ x: Math.random()*W, y: Math.random()*
   s: 1+Math.random()*2.5, v: 12+Math.random()*30, o: Math.random()*7 });
 requestAnimationFrame(loop);
 
-// ---------- Entradas ----------
 window.addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   keys[k] = true;
   if (k === 'f') knife();
+  if (k === 'm') toggleMusic();
   if (k === 'r' && (state === 'gameover' || state === 'victory')) startGame();
   if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
 });
@@ -637,8 +803,7 @@ canvas.addEventListener('mousedown', e => {
 });
 window.addEventListener('mouseup', e => { if (e.button === 0) mouse.down = false; });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
-btnStart.onclick = () => { try { AC && AC.resume(); } catch(e){} startGame(); };
-// toque básico: arrastar move a mira, toque atira
+btnStart.onclick = () => { audio(); if (musicOn) startMusic(); startGame(); };
 canvas.addEventListener('touchmove', e => {
   const t = e.touches[0]; mouse.x = t.clientX; mouse.y = t.clientY;
 }, { passive: true });
