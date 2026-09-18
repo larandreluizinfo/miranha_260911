@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Fazenda Apocalíptica — Leon K. vs Zumbis + Surf Music</title>
+<title>Fazenda Apocalíptica SIDE-VIEW — Leon Realista</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { width:100%; height:100%; overflow:hidden; background:#0d0906;
     font-family:'Segoe UI',Arial,sans-serif; user-select:none; }
-  #game { position:fixed; inset:0; width:100%; height:100%; display:block;
-    cursor:crosshair; }
+  #game { position:fixed; inset:0; width:100%; height:100%; display:block; cursor:crosshair; }
   #hud { position:fixed; top:0; left:0; right:0; display:flex; gap:10px;
     justify-content:center; align-items:center; padding:10px; pointer-events:none;
     z-index:5; flex-wrap:wrap; }
@@ -18,13 +17,11 @@
     font-weight:600; letter-spacing:.5px; backdrop-filter:blur(4px); }
   #hpbar { width:170px; height:10px; background:#3a1512; border-radius:99px;
     overflow:hidden; display:inline-block; vertical-align:middle; margin-left:8px; }
-  #hpfill { height:100%; width:100%; background:linear-gradient(90deg,#ff3b30,#ffcc00);
-    transition:width .2s; }
+  #hpfill { height:100%; width:100%; background:linear-gradient(90deg,#ff3b30,#ffcc00); transition:width .2s; }
   #overlay { position:fixed; inset:0; display:flex; align-items:center;
-    justify-content:center; z-index:10; background:rgba(5,3,2,.72);
-    backdrop-filter:blur(3px); }
+    justify-content:center; z-index:10; background:rgba(5,3,2,.72); backdrop-filter:blur(3px); }
   #overlay.hidden { display:none; }
-  .card { max-width:600px; width:92%; background:linear-gradient(180deg,#1d130c,#100b07);
+  .card { max-width:620px; width:92%; background:linear-gradient(180deg,#1d130c,#100b07);
     border:1px solid #ff963c55; border-radius:16px; padding:28px; text-align:center;
     color:#ffe6c4; box-shadow:0 20px 80px #000; max-height:92vh; overflow:auto; }
   .card h1 { font-size:28px; margin-bottom:8px; color:#ffb14e; }
@@ -42,51 +39,44 @@
   button:hover { filter:brightness(1.12); }
   #toast { position:fixed; top:64px; left:50%; transform:translateX(-50%);
     background:rgba(0,0,0,.7); color:#ffd166; padding:10px 22px; border-radius:999px;
-    font-weight:700; z-index:6; display:none; border:1px solid #ffd16655; }
+    font-weight:700; z-index:6; display:none; border:1px solid #ffd16655; white-space:nowrap; }
   #dmgflash { position:fixed; inset:0; pointer-events:none; z-index:7; opacity:0;
     background:radial-gradient(ellipse at center, transparent 55%, rgba(255,0,0,.55) 100%); }
   #musicBtn { position:fixed; bottom:16px; right:16px; z-index:8;
     background:rgba(10,8,5,.8); border:1px solid #4ecdc4; color:#a8fff8;
-    padding:10px 16px; border-radius:999px; font-size:13px; font-weight:700;
-    cursor:pointer; }
-  #musicBtn:hover { background:#123b38; }
+    padding:10px 16px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; }
   #musicBtn.off { border-color:#666; color:#999; }
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
-
 <div id="hud">
   <div class="pill">FASE <span id="hFase">–</span>/5</div>
   <div class="pill">ZUMBIS <span id="hZomb">–</span></div>
   <div class="pill">ABATES <span id="hKills">0</span></div>
   <div class="pill">VIDA <span id="hpbar"><span id="hpfill"></span></span></div>
   <div class="pill">ARMA <span id="hArma">PISTOLA</span></div>
-  <div class="pill">LEON K. ★</div>
+  <div class="pill">LEON ★ SIDE-VIEW</div>
 </div>
 <div id="toast"></div>
 <div id="dmgflash"></div>
 <button id="musicBtn">♪ SURF MUSIC: ON</button>
-
 <div id="overlay">
   <div class="card" id="cardMenu">
-    <div class="leon-badge">★ PROTAGONISTA: LEON K. — lendário sobrevivente ★</div>
+    <div class="leon-badge">★ LEON REALISTA — VISÃO LATERAL ★</div>
     <h1>FAZENDA APOCALÍPTICA</h1>
-    <p>Zumbis tomaram a fazenda! Você é <b>Leon K.</b>, jaqueta marrom, cabelo estiloso,
-    armado com <b>pistola</b> e <b>faca de combate</b>. Sobreviva às <b>5 fases</b>.</p>
+    <p>Agora em <b>visão de lado</b>! Leon corre pela fazenda, mira com o mouse e troca de arma sozinho:</p>
     <div class="keys">
-      <div><b>WASD / Setas</b> — mover</div>
-      <div><b>Mouse</b> — mirar &nbsp;•&nbsp; <b>Clique esquerdo</b> — atirar pistola</div>
-      <div><b>F</b> ou <b>botão direito</b> — facada (perto, dano alto)</div>
-      <div><b>M</b> — ligar/desligar música surf</div>
-      <div><b>R</b> — reiniciar após morte/vitória</div>
+      <div><b>A / D ou Setas</b> — correr</div>
+      <div><b>W / Espaço / Seta cima</b> — pular</div>
+      <div><b>Mouse</b> — mirar &nbsp;•&nbsp; <b>Clique</b> — atirar <b>pistola</b></div>
+      <div><b>F ou botão direito</b> — guarda a pistola e ataca só de <b>faca</b></div>
+      <div><b>M</b> — música surf &nbsp;•&nbsp; <b>R</b> — reiniciar</div>
     </div>
-    <p>♪ Trilha <b>surf rock original</b> estilo Super Surf (guitarra com reverb + bateria) — feita aqui mesmo no jogo, sem arquivo externo!</p>
-    <p>+30 de vida a cada fase. Cuidado com os <b>corredores</b> e os <b>brutamontes</b>!</p>
+    <p>Quando mira = só pistola na mão. Quando aperta F = só faca. Como você pediu!</p>
     <button id="btnStart">COMEÇAR A MISSÃO</button>
   </div>
 </div>
-
 <script>
 (() => {
 "use strict";
@@ -112,8 +102,9 @@ function resize() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 }
 window.addEventListener('resize', resize); resize();
+const groundY = () => H * 0.82;
 
-// ---------- Áudio SFX ----------
+// ---------- SFX ----------
 let AC = null;
 function audio() {
   if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
@@ -137,18 +128,22 @@ const sfxHit   = () => beep(140, 0.1, 'sawtooth', 0.08);
 const sfxDie   = () => beep(90, 0.25, 'sawtooth', 0.09);
 const sfxHurt  = () => beep(180, 0.2, 'square', 0.09);
 
-// ---------- MÚSICA SURF ROCK ORIGINAL (estilo Super Surf, sem copyright) ----------
-let musicOn = true, musicTimer = null, step = 0, nextTime = 0;
-const BPM = 168, SPB = 60 / BPM / 2; // colcheias
-// Progressão surf: E | E | A | B7 (original, cativante)
+// ---------- MÚSICA SURF ----------
+let musicOn = true, musicTimer = null, step = 0, nextTime = 0, musicBus = null;
+const BPM = 168, SPB = 60 / BPM / 2;
 const BASSLINE = [82.4,82.4,82.4,82.4, 82.4,82.4,110,110, 82.4,82.4,98,98, 123.5,123.5,98,98];
-// Melodia principal surf (original, com reverb de mola simulado)
-const LEAD = [
-  659,0,659,784, 0,659,0,494,
-  587,0,587,659, 0,587,494,0,
-  659,0,659,784, 880,784,659,587,
-  494,0,587,659, 587,494,82.4,0
-];
+const LEAD = [659,0,659,784, 0,659,0,494, 587,0,587,659, 0,587,494,0,
+  659,0,659,784, 880,784,659,587, 494,0,587,659, 587,494,82.4,0];
+function initMusicBus() {
+  const ac = audio();
+  if (musicBus) return;
+  musicBus = ac.createGain(); musicBus.gain.value = 0.5;
+  const delay = ac.createDelay(1); delay.delayTime.value = 0.23;
+  const fb = ac.createGain(); fb.gain.value = 0.32;
+  const wet = ac.createGain(); wet.gain.value = 0.35;
+  delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(ac.destination);
+  musicBus.connect(ac.destination); musicBus.connect(delay);
+}
 function noiseBurst(t, dur, vol, freq) {
   const ac = audio();
   const len = Math.floor(ac.sampleRate * dur);
@@ -161,26 +156,11 @@ function noiseBurst(t, dur, vol, freq) {
   src.connect(f); f.connect(g); g.connect(musicBus);
   src.start(t);
 }
-let musicBus = null, delaySend = null;
-function initMusicBus() {
-  const ac = audio();
-  if (musicBus) return;
-  musicBus = ac.createGain(); musicBus.gain.value = 0.5;
-  // reverb de mola fake: delay curto com feedback
-  const delay = ac.createDelay(1); delay.delayTime.value = 0.23;
-  const fb = ac.createGain(); fb.gain.value = 0.32;
-  const wet = ac.createGain(); wet.gain.value = 0.35;
-  delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(ac.destination);
-  delaySend = ac.createGain(); delaySend.gain.value = 1;
-  delaySend.connect(ac.destination); delaySend.connect(delay);
-  musicBus.connect(delaySend);
-}
 function playNote(t, freq, dur, type, vol) {
   if (!freq) return;
   const ac = audio();
   const o = ac.createOscillator(), g = ac.createGain();
   o.type = type; o.frequency.value = freq;
-  // vibrato surf
   const lfo = ac.createOscillator(); lfo.frequency.value = 6;
   const lg = ac.createGain(); lg.gain.value = 6;
   lfo.connect(lg); lg.connect(o.frequency);
@@ -192,10 +172,8 @@ function playNote(t, freq, dur, type, vol) {
 }
 function scheduleStep(s, t) {
   const i = s % 16;
-  // bateria surf: bumbo 1 e 3, caixa 2 e 4, chimbal direto
-  const bar = Math.floor(s / 16) % 4;
   const pos = s % 4;
-  if (pos === 0 || pos === 2) { // kick
+  if (pos === 0 || pos === 2) {
     const ac = audio();
     const o = ac.createOscillator(), g = ac.createGain();
     o.type = 'sine'; o.frequency.setValueAtTime(120, t);
@@ -204,48 +182,34 @@ function scheduleStep(s, t) {
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
     o.connect(g); g.connect(musicBus); o.start(t); o.stop(t + 0.16);
   }
-  if (pos === 1 || pos === 3) noiseBurst(t, 0.12, 0.35, 1800); // caixa
-  noiseBurst(t, 0.03, 0.08, 6000); // chimbal
-  // baixo
+  if (pos === 1 || pos === 3) noiseBurst(t, 0.12, 0.35, 1800);
+  noiseBurst(t, 0.03, 0.08, 6000);
   playNote(t, BASSLINE[i], 0.22, 'triangle', 0.28);
-  // base palhetada
   if (s % 2 === 0) playNote(t, BASSLINE[i]*2, 0.1, 'square', 0.06);
-  // solo surf (só a cada 2 compassos cheios p/ não enjoar, sempre toca)
   playNote(t, LEAD[s % LEAD.length], 0.21, 'square', 0.11);
 }
 function scheduler() {
   if (!musicOn) return;
   const ac = audio();
-  while (nextTime < ac.currentTime + 0.25) {
-    scheduleStep(step, nextTime);
-    nextTime += SPB;
-    step++;
-  }
+  while (nextTime < ac.currentTime + 0.25) { scheduleStep(step, nextTime); nextTime += SPB; step++; }
 }
 function startMusic() {
   try {
-    initMusicBus();
-    audio();
+    initMusicBus(); audio();
     if (musicTimer) clearInterval(musicTimer);
     step = 0; nextTime = audio().currentTime + 0.1;
     musicTimer = setInterval(scheduler, 80);
-    musicBtn.textContent = '♪ SURF MUSIC: ON';
-    musicBtn.classList.remove('off');
+    musicBtn.textContent = '♪ SURF MUSIC: ON'; musicBtn.classList.remove('off');
   } catch(e){}
 }
 function stopMusic() {
-  if (musicTimer) clearInterval(musicTimer);
-  musicTimer = null;
-  musicBtn.textContent = '♪ SURF MUSIC: OFF';
-  musicBtn.classList.add('off');
+  if (musicTimer) clearInterval(musicTimer); musicTimer = null;
+  musicBtn.textContent = '♪ SURF MUSIC: OFF'; musicBtn.classList.add('off');
 }
-function toggleMusic() {
-  musicOn = !musicOn;
-  if (musicOn) startMusic(); else stopMusic();
-}
+function toggleMusic() { musicOn = !musicOn; if (musicOn) startMusic(); else stopMusic(); }
 musicBtn.onclick = toggleMusic;
 
-// ---------- Estado ----------
+// ---------- ESTADO SIDE-VIEW ----------
 const FASES = [
   { total: 8,  interval: 1.5, maxAlive: 4,  pool: ['normal','normal','normal'] },
   { total: 12, interval: 1.2, maxAlive: 6,  pool: ['normal','normal','runner'] },
@@ -254,23 +218,23 @@ const FASES = [
   { total: 28, interval: 0.65,maxAlive: 10, pool: ['normal','runner','brute','runner','brute'] },
 ];
 const ZSTATS = {
-  normal: { hp: 3, speed: 62,  dmg: 10, r: 18, cor: '#7da05a', escuro: '#3d5527' },
-  runner: { hp: 2, speed: 138, dmg: 8,  r: 14, cor: '#b8c44a', escuro: '#5d6620' },
-  brute:  { hp: 10,speed: 40,  dmg: 22, r: 27, cor: '#8a6f5c', escuro: '#4a382c' },
+  normal: { hp: 3, speed: 70,  dmg: 10, h: 72, cor:'#7da05a', esc:'#3d5527', camisa:'#4a5a3a' },
+  runner: { hp: 2, speed: 165, dmg: 8,  h: 66, cor:'#b8c44a', esc:'#5d6620', camisa:'#6b6b2e' },
+  brute:  { hp: 11,speed: 48,  dmg: 22, h: 102,cor:'#8a6f5c', esc:'#4a382c', camisa:'#3d2f26' },
 };
+const GRAV = 2100, JUMP_V = 780;
 
 let state = 'menu';
 let player, bullets, zombies, parts, embers;
 let fase = 0, spawned = 0, kills = 0, killsFase = 0;
 let spawnTimer = 0, elapsed = 0;
-let mouse = { x: innerWidth/2, y: innerHeight/2, down: false };
+let mouse = { x: innerWidth*0.7, y: innerHeight*0.4, down: false };
 let keys = {};
-let shootCd = 0, knifeCd = 0, knifeAnim = 0;
-let clearTimer = 0, walkPhase = 0;
+let shootCd = 0, knifeCd = 0, knifeTimer = 0, walkPhase = 0, clearTimer = 0;
 
 function resetPlayer() {
-  player = { x: W/2, y: H*0.62, hp: 100, maxHp: 100, speed: 250,
-             ang: -Math.PI/2, r: 16, moving: false };
+  player = { x: W/2, y: groundY(), vx: 0, vy: 0, hp: 100, maxHp: 100, speed: 340,
+    face: 1, aim: 0, weapon: 'pistol', muzzle: 0, onGround: true, moving: false };
 }
 function startGame() {
   resetPlayer(); bullets = []; zombies = []; parts = []; embers = [];
@@ -295,28 +259,20 @@ function showToast(msg, ms) {
   showToast._t = setTimeout(() => toast.style.display = 'none', ms || 2600);
 }
 function endCard(titulo, texto, btn) {
-  cardMenu.innerHTML = '<div class="leon-badge">★ LEON K. ★</div><h2>' + titulo + '</h2><p>' + texto + '</p>' +
+  cardMenu.innerHTML = '<div class="leon-badge">★ LEON ★</div><h2>' + titulo + '</h2><p>' + texto + '</p>' +
     '<button id="btnAgain">' + btn + '</button><p style="font-size:13px">ou pressione R</p>';
   overlay.classList.remove('hidden');
   document.getElementById('btnAgain').onclick = startGame;
-}
-
-function spawnPos() {
-  const m = 30, lado = Math.floor(Math.random()*4);
-  if (lado === 0) return { x: Math.random()*W, y: -m };
-  if (lado === 1) return { x: W+m, y: Math.random()*H };
-  if (lado === 2) return { x: Math.random()*W, y: H+m };
-  return { x: -m, y: Math.random()*H };
 }
 function spawnZombie() {
   const cfg = FASES[fase-1];
   const tipo = cfg.pool[Math.floor(Math.random()*cfg.pool.length)];
   const st = ZSTATS[tipo];
-  const p = spawnPos();
-  const bonusVida = fase >= 4 ? 1 : 0;
-  zombies.push({ x: p.x, y: p.y, tipo, hp: st.hp + bonusVida,
-    maxHp: st.hp + bonusVida, speed: st.speed * (0.85 + Math.random()*0.35) + fase*3,
-    r: st.r, dmg: st.dmg, hitCd: 0, wob: Math.random()*10, wobV: 2+Math.random()*3 });
+  const lado = Math.random() < 0.5 ? -1 : 1;
+  const x = lado < 0 ? -40 : W + 40;
+  zombies.push({ x, y: groundY(), tipo, hp: st.hp + (fase >= 4 ? 1 : 0),
+    maxHp: st.hp + (fase >= 4 ? 1 : 0), speed: st.speed*(0.85+Math.random()*0.35)+fase*3,
+    h: st.h, dmg: st.dmg, hitCd: 0, wob: Math.random()*10, wobV: 6+Math.random()*4 });
   spawned++;
 }
 function updateHUD() {
@@ -325,120 +281,114 @@ function updateHUD() {
   hZomb.textContent = state === 'playing' ? ((cfg.total - killsFase) + ' esq.') : '–';
   hKills.textContent = kills;
   hpfill.style.width = Math.max(0, player ? player.hp : 0) + '%';
+  if (player) hArma.textContent = player.weapon === 'knife' ? 'FACA!' : 'PISTOLA';
 }
-
-// ---------- Combate ----------
+function shoulderPos() { return { x: player.x, y: player.y - 62 }; }
 function shoot() {
-  const a = player.ang;
-  const gx = player.x + Math.cos(a)*30, gy = player.y + Math.sin(a)*30;
-  bullets.push({ x: gx, y: gy, vx: Math.cos(a)*760, vy: Math.sin(a)*760,
-                 life: 1.1, r: 4 });
-  sfxShoot();
-  // clarão do tiro
-  player.muzzle = 0.06;
+  const s = shoulderPos();
+  const a = player.aim; // world angle
+  const gx = s.x + Math.cos(a)*34, gy = s.y + Math.sin(a)*34;
+  bullets.push({ x: gx, y: gy, vx: Math.cos(a)*820, vy: Math.sin(a)*820, life: 1.2, r: 4 });
+  sfxShoot(); player.muzzle = 0.06;
   for (let i = 0; i < 4; i++)
-    parts.push({ x: gx, y: gy, vx: (Math.random()-.5)*160, vy: (Math.random()-.5)*160,
-                 life: .25, max: .25, cor: '#ffcf6e', r: 2 });
+    parts.push({ x: gx, y: gy, vx:(Math.random()-.5)*160, vy:(Math.random()-.5)*160, life:.25, max:.25, cor:'#ffcf6e', r:2 });
 }
 function knife() {
   if (knifeCd > 0 || state !== 'playing') return;
-  knifeCd = 0.5; knifeAnim = 0.22; hArma.textContent = 'FACA!';
-  setTimeout(() => hArma.textContent = 'PISTOLA', 350);
-  sfxKnife();
-  const alcance = 110, arco = 1.0;
+  knifeCd = 0.5; knifeTimer = 0.30;
+  player.weapon = 'knife'; // guarda a pistola, só faca na mão
+  sfxKnife(); updateHUD();
+  // dano frontal em leque
   let acertou = false;
   for (const z of zombies) {
-    const dx = z.x - player.x, dy = z.y - player.y;
-    const d = Math.hypot(dx, dy);
-    if (d > alcance + z.r) continue;
-    let da = Math.atan2(dy, dx) - player.ang;
-    while (da > Math.PI) da -= Math.PI*2;
-    while (da < -Math.PI) da += Math.PI*2;
-    if (Math.abs(da) < arco) {
+    const dx = (z.x - player.x) * player.face; // >0 = na frente
+    const dy = Math.abs((z.y - z.h/2) - (player.y - 50));
+    if (dx > -10 && dx < 105 && dy < 70) {
       z.hp -= 3; acertou = true;
-      sangue(z.x, z.y, 10);
-      if (z.hp <= 0) matar(z);
-      else sfxHit();
+      sangue(z.x, z.y - z.h/2, 10);
+      if (z.hp <= 0) matar(z); else sfxHit();
     }
   }
+  const s = shoulderPos();
   for (let i = 0; i < 8; i++) {
-    const a = player.ang + (Math.random()-.5)*1.6;
-    parts.push({ x: player.x + Math.cos(a)*60, y: player.y + Math.sin(a)*60,
-      vx: Math.cos(a)*220, vy: Math.sin(a)*220, life: .2, max: .2, cor: '#e8e8e8', r: 2 });
+    parts.push({ x: s.x + player.face*40, y: s.y + (Math.random()-.5)*20,
+      vx: player.face*(120+Math.random()*160), vy:(Math.random()-.5)*160, life:.2, max:.2, cor:'#fff', r:2 });
   }
   if (acertou) updateHUD();
 }
 function sangue(x, y, n) {
   for (let i = 0; i < (n||8); i++) {
     const a = Math.random()*Math.PI*2, v = 60+Math.random()*220;
-    parts.push({ x, y, vx: Math.cos(a)*v, vy: Math.sin(a)*v,
-      life: .5, max: .5, cor: Math.random()<.5 ? '#8fbf4d' : '#4c6b2a', r: 2+Math.random()*3 });
+    parts.push({ x, y, vx: Math.cos(a)*v, vy: Math.sin(a)*v - 80,
+      life:.5, max:.5, cor: Math.random()<.5 ? '#8fbf4d' : '#4c6b2a', r: 2+Math.random()*3 });
   }
 }
-function matar(z) {
-  z.morto = true; kills++; killsFase++;
-  sangue(z.x, z.y, 14); sfxDie();
-  updateHUD();
-}
+function matar(z) { z.morto = true; kills++; killsFase++; sangue(z.x, z.y - 30, 14); sfxDie(); updateHUD(); }
 
-// ---------- Update ----------
 function update(dt) {
   elapsed += dt;
-  shootCd -= dt; knifeCd -= dt; knifeAnim -= dt;
+  shootCd -= dt; knifeCd -= dt;
   if (player.muzzle > 0) player.muzzle -= dt;
+  // volta pra pistola depois da facada
+  if (knifeTimer > 0) {
+    knifeTimer -= dt;
+    if (knifeTimer <= 0) { player.weapon = 'pistol'; updateHUD(); }
+  }
 
-  let mx = 0, my = 0;
-  if (keys['w'] || keys['arrowup']) my -= 1;
-  if (keys['s'] || keys['arrowdown']) my += 1;
+  // movimento lateral + pulo
+  let mx = 0;
   if (keys['a'] || keys['arrowleft']) mx -= 1;
   if (keys['d'] || keys['arrowright']) mx += 1;
-  player.moving = !!(mx || my);
-  if (mx || my) {
-    const l = Math.hypot(mx, my); mx/=l; my/=l;
-    player.x = Math.max(20, Math.min(W-20, player.x + mx*player.speed*dt));
-    player.y = Math.max(90, Math.min(H-20, player.y + my*player.speed*dt));
-    walkPhase += dt * 10;
-  }
-  player.ang = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+  player.moving = !!mx;
+  player.x = Math.max(24, Math.min(W-24, player.x + mx*player.speed*dt));
+  if (mx !== 0) walkPhase += dt*11;
 
-  if (mouse.down && shootCd <= 0 && state === 'playing') { shoot(); shootCd = 0.21; }
+  const wantJump = keys['w'] || keys['arrowup'] || keys[' '];
+  if (wantJump && player.onGround) { player.vy = -JUMP_V; player.onGround = false; }
+  player.vy += GRAV*dt;
+  player.y += player.vy*dt;
+  if (player.y >= groundY()) { player.y = groundY(); player.vy = 0; player.onGround = true; }
+  if (!player.onGround) player.moving = true;
+
+  // mira: facing pela posição do mouse
+  const s = shoulderPos();
+  player.aim = Math.atan2(mouse.y - s.y, mouse.x - s.x);
+  player.face = (mouse.x >= player.x) ? 1 : -1;
+  if (mx !== 0 && Math.abs(mouse.x - player.x) < 30) player.face = mx; // correndo sem mirar longe
+
+  if (mouse.down && shootCd <= 0 && state === 'playing' && player.weapon === 'pistol') { shoot(); shootCd = 0.21; }
 
   const cfg = FASES[fase-1];
   if (state === 'playing') {
     spawnTimer -= dt;
-    const vivos = zombies.length;
-    if (spawned < cfg.total && spawnTimer <= 0 && vivos < cfg.maxAlive) {
-      spawnZombie(); spawnTimer = cfg.interval;
-    }
-    if (spawned >= cfg.total && vivos === 0) {
+    if (spawned < cfg.total && spawnTimer <= 0 && zombies.length < cfg.maxAlive) { spawnZombie(); spawnTimer = cfg.interval; }
+    if (spawned >= cfg.total && zombies.length === 0) {
       if (fase >= 5) {
         state = 'victory';
-        endCard('VITÓRIA! 🏆', 'Leon limpou as 5 fases da fazenda com ' + kills + ' zumbis abatidos. Surf no pôr do sol apocalíptico!', 'JOGAR DE NOVO');
+        endCard('VITÓRIA! 🏆', 'Leon limpou as 5 fases da fazenda com ' + kills + ' abates!', 'JOGAR DE NOVO');
       } else {
         state = 'phaseclear'; clearTimer = 3;
         showToast('FASE ' + fase + ' COMPLETA! +30 vida', 2800);
-        beep(520, .15, 'sine', .08); setTimeout(() => beep(780, .2, 'sine', .08), 160);
+        beep(520,.15,'sine',.08); setTimeout(()=>beep(780,.2,'sine',.08),160);
       }
       updateHUD();
     }
   }
-  if (state === 'phaseclear') {
-    clearTimer -= dt;
-    if (clearTimer <= 0) startPhase(fase + 1);
-  }
+  if (state === 'phaseclear') { clearTimer -= dt; if (clearTimer <= 0) startPhase(fase+1); }
 
+  // balas
   for (let i = bullets.length-1; i >= 0; i--) {
     const b = bullets[i];
+    b.vy += 300*dt; // leve queda
     b.x += b.vx*dt; b.y += b.vy*dt; b.life -= dt;
-    if (b.life <= 0 || b.x < -20 || b.x > W+20 || b.y < -20 || b.y > H+20) {
-      bullets.splice(i, 1); continue;
-    }
+    if (b.life <= 0 || b.x < -30 || b.x > W+30 || b.y > groundY()+10) { bullets.splice(i,1); continue; }
     for (const z of zombies) {
       if (z.morto) continue;
-      const d = Math.hypot(z.x-b.x, z.y-b.y);
-      if (d < z.r + b.r) {
-        z.hp -= 1; sangue(b.x, b.y, 5);
-        bullets.splice(i, 1);
+      const zx = z.x, zy = z.y - z.h/2;
+      const d = Math.hypot(zx-b.x, zy-b.y);
+      const rr = (z.tipo === 'brute' ? 30 : 20) + b.r;
+      if (d < rr) {
+        z.hp -= 1; sangue(b.x, b.y, 5); bullets.splice(i,1);
         if (z.hp <= 0) matar(z); else sfxHit();
         break;
       }
@@ -446,27 +396,23 @@ function update(dt) {
   }
   zombies = zombies.filter(z => !z.morto);
 
+  // zumbis andam até o Leon no chão
   for (const z of zombies) {
     z.hitCd -= dt; z.wob += dt*z.wobV;
-    const dx = player.x - z.x, dy = player.y - z.y;
-    const d = Math.hypot(dx, dy) || 1;
-    const wob = Math.sin(z.wob)*0.35;
-    const nx = dx/d, ny = dy/d;
-    const vx = (nx*Math.cos(wob) - ny*Math.sin(wob))*z.speed;
-    const vy = (nx*Math.sin(wob) + ny*Math.cos(wob))*z.speed;
-    z.x += vx*dt; z.y += vy*dt;
-    for (const o of zombies) {
-      if (o === z || o.morto) continue;
-      const sx = z.x-o.x, sy = z.y-o.y, sd = Math.hypot(sx, sy);
-      if (sd > 0 && sd < z.r+o.r) { z.x += sx/sd*22*dt; z.y += sy/sd*22*dt; }
-    }
-    if (d < z.r + player.r + 4 && z.hitCd <= 0 && state === 'playing') {
+    const dir = Math.sign(player.x - z.x) || 1;
+    // runner pula às vezes
+    let zy = groundY();
+    if (z.tipo === 'runner') zy -= Math.abs(Math.sin(z.wob*1.6))*8;
+    z.x += dir * z.speed * dt;
+    z.y += (zy - z.y) * Math.min(1, dt*10);
+    const dx = Math.abs(player.x - z.x);
+    const dy = Math.abs(player.y - z.y);
+    if (dx < 34 && dy < 90 && z.hitCd <= 0 && state === 'playing') {
       z.hitCd = 0.9;
-      player.hp -= z.dmg;
-      sfxHurt();
+      player.hp -= z.dmg; sfxHurt();
       dmgflash.style.opacity = 1;
-      setTimeout(() => dmgflash.style.opacity = 0, 180);
-      sangue(player.x, player.y, 8);
+      setTimeout(()=>dmgflash.style.opacity = 0, 180);
+      sangue(player.x, player.y-50, 8);
       updateHUD();
       if (player.hp <= 0) {
         player.hp = 0; state = 'gameover'; updateHUD();
@@ -477,8 +423,9 @@ function update(dt) {
 
   for (let i = parts.length-1; i >= 0; i--) {
     const p = parts[i];
-    p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= .92; p.vy *= .92; p.life -= dt;
-    if (p.life <= 0) parts.splice(i, 1);
+    p.vy += 600*dt;
+    p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= .98; p.life -= dt;
+    if (p.life <= 0 || p.y > groundY()+6) parts.splice(i,1);
   }
   for (const e of embers) {
     e.y -= e.v*dt; e.x += Math.sin(elapsed + e.o)*20*dt;
@@ -487,259 +434,262 @@ function update(dt) {
   updateHUD();
 }
 
-// ---------- Desenho: fazenda pós-apocalíptica ----------
+// ---------- FUNDO SIDE-VIEW ----------
 function drawBackground(t) {
-  const ceu = ctx.createLinearGradient(0, 0, 0, H*0.65);
-  ceu.addColorStop(0, '#0b0705'); ceu.addColorStop(0.45, '#3a1c0d');
-  ceu.addColorStop(0.75, '#7a3a12'); ceu.addColorStop(1, '#a8541c');
-  ctx.fillStyle = ceu; ctx.fillRect(0, 0, W, H*0.66);
+  const gy = groundY();
+  const ceu = ctx.createLinearGradient(0,0,0,gy);
+  ceu.addColorStop(0,'#0b0705'); ceu.addColorStop(0.5,'#3a1c0d');
+  ceu.addColorStop(0.8,'#7a3a12'); ceu.addColorStop(1,'#a8541c');
+  ctx.fillStyle = ceu; ctx.fillRect(0,0,W,gy+2);
 
-  const sx = W*0.72, sy = H*0.24;
-  const glow = ctx.createRadialGradient(sx, sy, 10, sx, sy, 130);
-  glow.addColorStop(0, 'rgba(255,200,120,.9)'); glow.addColorStop(1, 'rgba(255,120,40,0)');
-  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(sx, sy, 130, 0, 7); ctx.fill();
-  ctx.fillStyle = '#f7d9a8'; ctx.beginPath(); ctx.arc(sx, sy, 34, 0, 7); ctx.fill();
+  const sx = W*0.72, sy = H*0.22;
+  const glow = ctx.createRadialGradient(sx,sy,10,sx,sy,130);
+  glow.addColorStop(0,'rgba(255,200,120,.9)'); glow.addColorStop(1,'rgba(255,120,40,0)');
+  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(sx,sy,130,0,7); ctx.fill();
+  ctx.fillStyle = '#f7d9a8'; ctx.beginPath(); ctx.arc(sx,sy,32,0,7); ctx.fill();
 
   ctx.fillStyle = 'rgba(20,12,8,.55)';
-  for (let i = 0; i < 7; i++) {
-    const cx = ((i*W/6) + t*12*(1+i*0.2)) % (W+300) - 150;
-    const cy = H*0.08 + (i%3)*H*0.07;
-    ctx.beginPath(); ctx.ellipse(cx, cy, 120+((i*37)%60), 22+(i%3)*8, 0, 0, 7); ctx.fill();
+  for (let i = 0; i < 6; i++) {
+    const cx = ((i*W/5) + t*12*(1+i*0.2)) % (W+300) - 150;
+    ctx.beginPath(); ctx.ellipse(cx, H*0.12+(i%3)*30, 120, 20, 0, 0, 7); ctx.fill();
   }
-
+  // colinas ao fundo
   ctx.fillStyle = '#241209';
-  ctx.beginPath(); ctx.moveTo(0, H*0.52);
-  for (let x = 0; x <= W; x += 40) ctx.lineTo(x, H*0.52 - Math.sin(x*0.01)*22 - 10);
-  ctx.lineTo(W, H*0.66); ctx.lineTo(0, H*0.66); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(0,gy);
+  for (let x = 0; x <= W; x += 40) ctx.lineTo(x, gy-40-Math.sin(x*0.01)*18);
+  ctx.lineTo(W,gy); ctx.closePath(); ctx.fill();
 
-  const bx = W*0.07, by = H*0.30, bw = Math.min(220, W*0.2), bh = 130;
-  ctx.fillStyle = '#4a2a16'; ctx.fillRect(bx, by, bw, bh);
+  // celeiro lateral (esquerda)
+  const bx = W*0.05, bw = Math.min(230,W*0.22), bh = 150, by = gy-bh;
+  ctx.fillStyle = '#4a2a16'; ctx.fillRect(bx,by,bw,bh);
   ctx.fillStyle = '#2c170b';
-  ctx.beginPath(); ctx.moveTo(bx-12, by); ctx.lineTo(bx+bw*0.4, by-56);
-  ctx.lineTo(bx+bw*0.62, by-20); ctx.lineTo(bx+bw, by); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#160c06';
-  ctx.beginPath(); ctx.moveTo(bx+bw*0.4, by-56); ctx.lineTo(bx+bw*0.62, by-20);
-  ctx.lineTo(bx+bw*0.5, by-8); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#120a05'; ctx.fillRect(bx+bw*0.32, by+bh*0.3, bw*0.36, bh*0.7);
-  ctx.strokeStyle = 'rgba(0,0,0,.5)'; ctx.lineWidth = 2;
-  for (let i = 1; i < 5; i++) { ctx.beginPath();
-    ctx.moveTo(bx, by+i*bh/5); ctx.lineTo(bx+bw, by+i*bh/5); ctx.stroke(); }
-  const fl = 0.6 + Math.sin(t*9)*0.3;
-  ctx.fillStyle = 'rgba(255,' + Math.floor(90+60*fl) + ',20,.85)';
-  ctx.beginPath(); ctx.ellipse(bx+bw*0.5, by+bh*0.86, 16*fl+8, 10, 0, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(bx-12,by); ctx.lineTo(bx+bw/2,by-60); ctx.lineTo(bx+bw+12,by); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#120a05'; ctx.fillRect(bx+bw*0.35,by+50,bw*0.3,bh-50);
+  ctx.strokeStyle = 'rgba(0,0,0,.5)';
+  for (let i = 1; i < 5; i++) { ctx.beginPath(); ctx.moveTo(bx,by+i*bh/5); ctx.lineTo(bx+bw,by+i*bh/5); ctx.stroke(); }
+  const fl = 0.6+Math.sin(t*9)*0.3;
+  ctx.fillStyle = 'rgba(255,'+Math.floor(90+60*fl)+',20,.85)';
+  ctx.beginPath(); ctx.ellipse(bx+bw/2,by+bh-12,18*fl+8,10,0,0,7); ctx.fill();
 
-  const gx = W*0.86, gy = H*0.28, gw = 64, gh = 170;
-  ctx.save(); ctx.translate(gx, gy); ctx.rotate(0.09);
-  ctx.fillStyle = '#5c6066'; ctx.fillRect(-gw/2, 0, gw, gh);
-  ctx.fillStyle = '#3c3f44'; ctx.fillRect(-gw/2, 0, gw, 22);
-  ctx.fillStyle = '#7a3b1a';
-  for (let i = 0; i < 5; i++) ctx.fillRect(-gw/2, 30+i*30, gw, 7);
-  ctx.fillStyle = '#0d0906';
-  ctx.beginPath(); ctx.ellipse(4, 70, 14, 20, 0.3, 0, 7); ctx.fill();
-  ctx.restore();
+  // silo direita
+  const gx = W*0.88, gw = 64, gh = 190, gy2 = gy-gh;
+  ctx.fillStyle = '#5c6066'; ctx.fillRect(gx-gw/2,gy2,gw,gh);
+  ctx.fillStyle = '#3c3f44'; ctx.fillRect(gx-gw/2,gy2,gw,22);
+  ctx.fillStyle = '#0d0906'; ctx.beginPath(); ctx.ellipse(gx,gy2+90,14,20,0.2,0,7); ctx.fill();
 
-  const mx = W*0.30, my = H*0.44;
+  // moinho
+  const mx = W*0.34;
   ctx.strokeStyle = '#1d130c'; ctx.lineWidth = 6;
-  ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx+8, my-110); ctx.stroke();
-  ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.moveTo(mx+8, my-110); ctx.lineTo(mx-38, my-140); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(mx+8, my-110); ctx.lineTo(mx+44, my-88); ctx.stroke();
-  ctx.setLineDash([6,5]); ctx.beginPath();
-  ctx.moveTo(mx+8, my-110); ctx.lineTo(mx+30, my-150); ctx.stroke(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(mx,gy-20); ctx.lineTo(mx+8,gy-130); ctx.stroke();
 
-  function arvore(x, y, s) {
-    ctx.strokeStyle = '#140d08'; ctx.lineWidth = 5*s; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x+4*s, y-60*s); ctx.stroke();
+  // árvores mortas
+  function arvore(x,s){
+    ctx.strokeStyle = '#140d08'; ctx.lineCap='round'; ctx.lineWidth = 5*s;
+    ctx.beginPath(); ctx.moveTo(x,gy); ctx.lineTo(x+4*s,gy-60*s); ctx.stroke();
     ctx.lineWidth = 3*s;
-    ctx.beginPath(); ctx.moveTo(x+4*s, y-60*s); ctx.lineTo(x-24*s, y-92*s); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x+4*s, y-60*s); ctx.lineTo(x+30*s, y-84*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+4*s,gy-60*s); ctx.lineTo(x-24*s,gy-92*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+4*s,gy-60*s); ctx.lineTo(x+30*s,gy-84*s); ctx.stroke();
   }
-  arvore(W*0.48, H*0.52, 1); arvore(W*0.62, H*0.55, 0.7); arvore(W*0.16, H*0.56, 0.85);
+  arvore(W*0.5,1); arvore(W*0.62,0.7);
 
-  const chao = ctx.createLinearGradient(0, H*0.5, 0, H);
-  chao.addColorStop(0, '#3a2412'); chao.addColorStop(0.4, '#2a1a0d');
-  chao.addColorStop(1, '#120b06');
-  ctx.fillStyle = chao; ctx.fillRect(0, H*0.5, W, H*0.5);
-
-  ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 2;
-  for (let i = 0; i < 8; i++) {
-    const cx0 = (i*197) % W, cy0 = H*0.62 + (i*53) % (H*0.3);
-    ctx.beginPath(); ctx.moveTo(cx0, cy0);
-    ctx.lineTo(cx0+40, cy0+8); ctx.lineTo(cx0+70, cy0-6); ctx.lineTo(cx0+110, cy0+10);
-    ctx.stroke();
-  }
-  ctx.strokeStyle = '#6b5a2e'; ctx.lineWidth = 2;
-  for (let i = 0; i < 40; i++) {
-    const px = (i*173.3) % W, py = H*0.58 + (i*97) % (H*0.36);
-    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px-4, py-12);
-    ctx.moveTo(px, py); ctx.lineTo(px+3, py-14); ctx.stroke();
-  }
-
-  const tx = W*0.55, ty = H*0.72;
-  ctx.fillStyle = '#3f4a1e'; ctx.fillRect(tx, ty-34, 120, 34);
-  ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(tx+26, ty+6, 22, 0, 7); ctx.fill();
-  ctx.beginPath(); ctx.arc(tx+104, ty+10, 14, 0, 7); ctx.fill();
-  ctx.strokeStyle = '#111'; ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(tx+30, ty-34); ctx.lineTo(tx+62, ty-70); ctx.stroke();
-
-  const fy = H*0.56;
+  // chão
+  const chao = ctx.createLinearGradient(0,gy,0,H);
+  chao.addColorStop(0,'#3a2412'); chao.addColorStop(1,'#120b06');
+  ctx.fillStyle = chao; ctx.fillRect(0,gy,W,H-gy);
+  ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(0,gy,W,4);
+  // cerca
   ctx.fillStyle = '#2e1c0e';
-  for (let x = 0; x < W; x += 90) {
-    const tilt = Math.sin(x)*0.12 + (x % 270 === 0 ? 0.5 : 0);
-    ctx.save(); ctx.translate(x, fy); ctx.rotate(tilt);
-    ctx.fillRect(-4, -46, 8, 46); ctx.restore();
-  }
+  for (let x = 20; x < W; x += 110) ctx.fillRect(x,gy-46,8,46);
   ctx.strokeStyle = 'rgba(60,40,20,.9)'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(0, fy-38);
-  for (let x = 0; x <= W; x += 90) ctx.lineTo(x, fy-38+Math.sin(x)*3);
-  ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,gy-38); ctx.lineTo(W,gy-38); ctx.stroke();
+  // capim
+  ctx.strokeStyle = '#6b5a2e';
+  for (let i = 0; i < 50; i++) {
+    const px = (i*173.3)%W, py = gy+8+(i*97)%(H-gy-16);
+    ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px-4,py-10); ctx.moveTo(px,py); ctx.lineTo(px+3,py-12); ctx.stroke();
+  }
+  // trator lateral
+  const tx = W*0.58;
+  ctx.fillStyle = '#3f4a1e'; ctx.fillRect(tx,gy-54,120,34);
+  ctx.fillStyle = '#222';
+  ctx.beginPath(); ctx.arc(tx+26,gy-8,22,0,7); ctx.fill();
+  ctx.beginPath(); ctx.arc(tx+104,gy-8,14,0,7); ctx.fill();
 
   for (const e of embers) {
-    ctx.fillStyle = 'rgba(255,' + Math.floor(120+Math.random()*80) + ',40,.8)';
-    ctx.beginPath(); ctx.arc(e.x, e.y, e.s, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,'+Math.floor(120+Math.random()*80)+',40,.8)';
+    ctx.beginPath(); ctx.arc(e.x,e.y,e.s,0,7); ctx.fill();
   }
-
-  const nevoa = ctx.createLinearGradient(0, H*0.5, 0, H*0.8);
-  nevoa.addColorStop(0, 'rgba(160,140,120,0)'); nevoa.addColorStop(1, 'rgba(160,140,120,.14)');
-  ctx.fillStyle = nevoa; ctx.fillRect(0, H*0.4, W, H*0.6);
-
-  const vg = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.35, W/2, H/2, Math.max(W,H)*0.75);
-  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.55)');
-  ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+  const vg = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.75);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.55)');
+  ctx.fillStyle = vg; ctx.fillRect(0,0,W,H);
 }
 
-// ---------- LEON K. — inspirado em Leon S. Kennedy (RE) ----------
+// ---------- LEON REALISTA LATERAL, UMA ARMA POR VEZ ----------
 function drawPlayer(t) {
   const p = player;
   ctx.save(); ctx.translate(p.x, p.y);
   ctx.fillStyle = 'rgba(0,0,0,.45)';
-  ctx.beginPath(); ctx.ellipse(0, 14, 17, 7, 0, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0,4,20,7,0,0,7); ctx.fill();
+  ctx.scale(p.face,1); // espelha p/ lado da mira
 
-  // pernas (animação andar)
-  const lp = p.moving ? Math.sin(walkPhase) * 6 : 0;
-  ctx.fillStyle = '#2b2f36';
-  ctx.fillRect(-9, 2 + lp*0.4, 7, 12);
-  ctx.fillRect(2, 2 - lp*0.4, 7, 12);
-  ctx.fillStyle = '#111';
-  ctx.fillRect(-9, 12 + lp*0.4, 7, 5);
-  ctx.fillRect(2, 12 - lp*0.4, 7, 5);
+  const swing = (p.moving && p.onGround) ? Math.sin(walkPhase)*10 : 0;
+  const air = !p.onGround ? 6 : 0;
 
-  const a = p.ang;
-  // corpo é desenhado rotacionado p/ frente = mira
-  ctx.save(); ctx.rotate(a + Math.PI/2);
+  ctx.lineCap = 'round';
+  // perna de trás (escura)
+  ctx.strokeStyle = '#232b3a'; ctx.lineWidth = 10;
+  ctx.beginPath(); ctx.moveTo(-2,-42); ctx.lineTo(-6 - swing, -4 - air); ctx.stroke();
+  ctx.fillStyle = '#1a120b'; ctx.fillRect(-13 - swing, -10 - air, 15, 8); // bota trás
+  // perna da frente (jeans)
+  ctx.strokeStyle = '#2e3d55'; ctx.lineWidth = 10;
+  ctx.beginPath(); ctx.moveTo(2,-42); ctx.lineTo(6 + swing, -4); ctx.stroke();
+  ctx.fillStyle = '#2b1c10'; ctx.fillRect(-1 + swing, -10, 16, 8); // bota frente
 
-  // jaqueta marrom do Leon (RE4)
-  ctx.fillStyle = '#6b4a2f';
-  ctx.beginPath(); ctx.ellipse(0, 0, 15, 17, 0, 0, 7); ctx.fill();
-  ctx.fillStyle = '#7d5a3a';
-  ctx.beginPath(); ctx.ellipse(-4, -2, 7, 12, 0.2, 0, 7); ctx.fill();
-  // camisa preta + coldre
-  ctx.fillStyle = '#15181d';
-  ctx.fillRect(-4, -14, 8, 26);
-  ctx.fillStyle = '#0c0e11';
-  ctx.fillRect(-9, 2, 18, 4); // cinto
-  ctx.fillStyle = '#c9a227';
-  ctx.fillRect(-2, 2, 4, 4); // fivela
-  // ombreiras / gola
-  ctx.fillStyle = '#4a3220';
-  ctx.beginPath(); ctx.moveTo(-12, -10); ctx.lineTo(-5, -16); ctx.lineTo(-5, -8); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(12, -10); ctx.lineTo(5, -16); ctx.lineTo(5, -8); ctx.closePath(); ctx.fill();
-  // patch R.P.D. azul no ombro
-  ctx.fillStyle = '#1c3a5e';
-  ctx.beginPath(); ctx.arc(11, 2, 4.5, 0, 7); ctx.fill();
-  ctx.fillStyle = '#cfe4ff'; ctx.font = 'bold 4px Arial'; ctx.textAlign = 'center';
-  ctx.fillText('RPD', 11, 3.5);
+  // torso: jaqueta marrom Leon RE4
+  ctx.fillStyle = '#5d3f27';
+  ctx.beginPath();
+  ctx.moveTo(-11,-72); ctx.lineTo(11,-72); ctx.lineTo(13,-44); ctx.lineTo(-11,-42); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#6f4f32';
+  ctx.beginPath();
+  ctx.moveTo(-11,-72); ctx.lineTo(-2,-72); ctx.lineTo(-4,-44); ctx.lineTo(-11,-42); ctx.closePath(); ctx.fill();
+  // zíper + cinto
+  ctx.strokeStyle = '#2b1c10'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(1,-70); ctx.lineTo(1,-44); ctx.stroke();
+  ctx.fillStyle = '#141414'; ctx.fillRect(-12,-46,25,6);
+  ctx.fillStyle = '#c9a227'; ctx.fillRect(-2,-46,5,6);
+  // gola
+  ctx.fillStyle = '#3f2a18';
+  ctx.beginPath(); ctx.moveTo(-10,-72); ctx.lineTo(-4,-78); ctx.lineTo(-2,-71); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(10,-72); ctx.lineTo(5,-78); ctx.lineTo(3,-71); ctx.closePath(); ctx.fill();
+  // patch RPD no ombro (visível de lado)
+  ctx.fillStyle = '#1c3a5e'; ctx.beginPath(); ctx.arc(-4,-62,5,0,7); ctx.fill();
+  ctx.fillStyle = '#cfe4ff'; ctx.font = 'bold 5px Arial'; ctx.textAlign='center';
+  ctx.fillText('RPD',-4,-60);
 
-  // cabeça: pele + cabelo castanho estilo Leon
+  // cabeça realista lateral
+  // pescoço
+  ctx.fillStyle = '#d9a377'; ctx.fillRect(-3,-82,8,8);
+  // rosto
   ctx.fillStyle = '#e8b88a';
-  ctx.beginPath(); ctx.arc(0, -22, 9, 0, 7); ctx.fill();
-  // cabelo (franja lateral característica)
+  ctx.beginPath(); ctx.ellipse(3,-88,8,9,0,0,7); ctx.fill();
+  // nariz + olho + sobrancelha
+  ctx.fillStyle = '#c9986f'; ctx.fillRect(10,-88,3,4);
+  ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(5,-89,1.6,0,7); ctx.fill();
+  ctx.strokeStyle = '#2b1c10'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(2,-93); ctx.lineTo(8,-92); ctx.stroke();
+  // cabelo Leon: volume em cima + franja lateral
   ctx.fillStyle = '#3a2a1c';
-  ctx.beginPath(); ctx.arc(0, -24, 9.5, Math.PI*0.9, Math.PI*2.1); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(-9, -24); ctx.lineTo(-11, -16); ctx.lineTo(-6, -20); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(9, -24); ctx.lineTo(11, -16); ctx.lineTo(6, -20); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#2c2015';
-  ctx.beginPath(); ctx.ellipse(-2, -27, 7, 3.5, -0.3, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0,-95,10,6,-0.2,0,7); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-9,-94); ctx.lineTo(-12,-84); ctx.lineTo(-6,-88); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(6,-99); ctx.lineTo(10,-90); ctx.lineTo(4,-92); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#4d3a26';
+  ctx.beginPath(); ctx.ellipse(-1,-97,7,3,-0.3,0,7); ctx.fill();
 
-  // BRAÇO DIREITO: pistola
-  ctx.save(); ctx.translate(10, -4); ctx.rotate(0.15);
-  ctx.fillStyle = '#7d5a3a'; ctx.fillRect(0, -3, 14, 6); // manga
-  ctx.fillStyle = '#e8b88a'; ctx.beginPath(); ctx.arc(15, 0, 3.5, 0, 7); ctx.fill();
-  ctx.fillStyle = '#181818'; ctx.fillRect(14, -2.5, 20, 5); // pistola
-  ctx.fillStyle = '#9aa0a8'; ctx.fillRect(28, -1.5, 6, 3); // cano
-  ctx.fillStyle = '#333'; ctx.fillRect(17, 2, 4, 6); // empunhadura
-  // clarão do tiro
-  if (p.muzzle > 0) {
-    ctx.fillStyle = 'rgba(255,220,120,.95)';
-    ctx.beginPath(); ctx.moveTo(34, 0); ctx.lineTo(46, -6); ctx.lineTo(46, 6); ctx.closePath(); ctx.fill();
-  }
-  ctx.restore();
+  // ângulo local da mira (já espelhado)
+  const s = { x: 0, y: -62 };
+  let local = Math.atan2(mouse.y-(p.y-62),(mouse.x-p.x)*p.face);
+  if (local > 1.35) local = 1.35;
+  if (local < -1.35) local = -1.35;
 
-  // BRAÇO ESQUERDO: faca de combate
-  const knifeOut = knifeAnim > 0 ? 1 : 0;
-  ctx.save(); ctx.translate(-10, -2); ctx.rotate(-0.25 - knifeOut*0.5);
-  ctx.fillStyle = '#6b4a2f'; ctx.fillRect(-12, -3, 12, 6);
-  ctx.fillStyle = '#e8b88a'; ctx.beginPath(); ctx.arc(-13, 0, 3.5, 0, 7); ctx.fill();
-  ctx.fillStyle = '#5a3a22'; ctx.fillRect(-20, -2, 7, 4); // cabo
-  ctx.fillStyle = knifeOut ? '#ffffff' : '#c8ccd2'; // lâmina
-  ctx.beginPath(); ctx.moveTo(-20, -2.5); ctx.lineTo(-34, -1); ctx.lineTo(-34, 1); ctx.lineTo(-20, 2.5); ctx.closePath(); ctx.fill();
-  ctx.restore();
-
-  ctx.restore(); // fim do corpo rotacionado
-  ctx.restore();
-
-  // arco da facada
-  if (knifeAnim > 0) {
-    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang);
-    ctx.strokeStyle = 'rgba(255,255,255,' + (knifeAnim/0.22) + ')';
-    ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.arc(0, 0, 72, -0.9, 0.9); ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,220,150,' + (knifeAnim/0.22*0.7) + ')';
-    ctx.lineWidth = 11;
-    ctx.beginPath(); ctx.arc(0, 0, 62, -0.8, 0.8); ctx.stroke();
-    ctx.fillStyle = 'rgba(255,255,255,.9)';
-    ctx.font = 'bold 13px Arial'; ctx.textAlign = 'center';
-    ctx.fillText('FACA!', 0, -80);
+  if (p.weapon === 'pistol') {
+    // SÓ PISTOLA: braço estendido mirando, faca guardada (não aparece)
+    ctx.save(); ctx.translate(s.x,s.y); ctx.rotate(local);
+    // manga da jaqueta
+    ctx.fillStyle = '#5d3f27'; ctx.fillRect(-4,-5,18,10);
+    // mão
+    ctx.fillStyle = '#e8b88a'; ctx.beginPath(); ctx.arc(15,0,4.5,0,7); ctx.fill();
+    // pistola realista lateral
+    ctx.fillStyle = '#171717'; ctx.fillRect(14,-3.5,22,6);
+    ctx.fillStyle = '#8f959d'; ctx.fillRect(14,-3.5,22,2); // brilho do ferrolho
+    ctx.fillStyle = '#0c0c0c'; ctx.fillRect(17,2,5,8); // empunhadura
+    ctx.fillStyle = '#333'; ctx.fillRect(33,-1.5,4,3); // cano
+    if (p.muzzle > 0) {
+      ctx.fillStyle = 'rgba(255,220,120,.95)';
+      ctx.beginPath(); ctx.moveTo(37,0); ctx.lineTo(52,-8); ctx.lineTo(52,8); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(40,0,4,0,7); ctx.fill();
+    }
+    ctx.restore();
+    // braço de apoio junto ao peito (sem arma)
+    ctx.fillStyle = '#4d3421'; ctx.fillRect(-8,-60,12,7);
+  } else {
+    // SÓ FACA: pistola guardada no coldre (só o cabo aparece), mão com faca
+    // cabo da pistola no coldre da cintura
+    ctx.fillStyle = '#0c0c0c'; ctx.fillRect(6,-50,6,8);
+    const slash = 1 - knifeTimer/0.30; // 0→1
+    ctx.save(); ctx.translate(s.x,s.y); ctx.rotate(-0.15 + Math.sin(slash*Math.PI)*0.55);
+    ctx.fillStyle = '#5d3f27'; ctx.fillRect(-4,-5,18,10);
+    ctx.fillStyle = '#e8b88a'; ctx.beginPath(); ctx.arc(15,0,4.5,0,7); ctx.fill();
+    // faca de combate
+    ctx.fillStyle = '#4a2c14'; ctx.fillRect(14,-2.5,9,5); // cabo
+    ctx.fillStyle = '#dfe5ec';
+    ctx.beginPath(); ctx.moveTo(23,-3); ctx.lineTo(46,-1.5); ctx.lineTo(46,1.5); ctx.lineTo(23,3); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.fillRect(24,-1,18,1); // fio
+    ctx.restore();
+    // arco do corte
+    ctx.save(); ctx.translate(s.x,s.y);
+    ctx.strokeStyle = 'rgba(255,255,255,'+(0.9*(1-slash))+')'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(10,0,46,-0.9+slash*0.9,0.5+slash*0.9); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,220,150,'+(0.9*(1-slash))+')';
+    ctx.font = 'bold 13px Arial'; ctx.textAlign='center';
+    ctx.fillText('FACA!', 30, -34);
     ctx.restore();
   }
-  // nome + vida
-  ctx.fillStyle = 'rgba(0,0,0,.65)'; ctx.fillRect(p.x-30, p.y-46, 60, 8);
+  ctx.restore();
+
+  // barra de vida + nome (sem espelhar)
+  ctx.fillStyle = 'rgba(0,0,0,.65)'; ctx.fillRect(p.x-30,p.y-112,60,8);
   ctx.fillStyle = p.hp > 40 ? '#5dd35d' : '#ff4b4b';
-  ctx.fillRect(p.x-29, p.y-45, 58*Math.max(0,p.hp)/100, 6);
-  ctx.fillStyle = '#cfe4ff'; ctx.font = 'bold 10px Arial'; ctx.textAlign = 'center';
-  ctx.fillText('LEON K.', p.x, p.y-50);
+  ctx.fillRect(p.x-29,p.y-111,58*Math.max(0,p.hp)/100,6);
+  ctx.fillStyle = '#cfe4ff'; ctx.font = 'bold 10px Arial'; ctx.textAlign='center';
+  ctx.fillText('LEON', p.x, p.y-116);
 }
 
+// ---------- ZUMBIS LATERAIS ----------
 function drawZombies(t) {
   for (const z of zombies) {
     const st = ZSTATS[z.tipo];
+    const face = (player.x >= z.x) ? 1 : -1;
+    const h = z.h, wob = Math.sin(z.wob)*4;
     ctx.save(); ctx.translate(z.x, z.y);
     ctx.fillStyle = 'rgba(0,0,0,.4)';
-    ctx.beginPath(); ctx.ellipse(0, z.r*0.7, z.r, z.r*0.4, 0, 0, 7); ctx.fill();
-    const bal = Math.sin(z.wob)*3;
+    ctx.beginPath(); ctx.ellipse(0,3,h*0.25,6,0,0,7); ctx.fill();
+    ctx.scale(face,1);
+    const lp = Math.sin(z.wob)*8;
+    ctx.lineCap = 'round';
+    // pernas
+    ctx.strokeStyle = st.esc; ctx.lineWidth = z.tipo==='brute'?12:9;
+    ctx.beginPath(); ctx.moveTo(0,-h*0.5); ctx.lineTo(-4-lp,-2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-h*0.5); ctx.lineTo(4+lp,-2); ctx.stroke();
+    // torso rasgado
+    ctx.fillStyle = st.camisa;
+    ctx.fillRect(-10,-h*0.85,20,h*0.38);
     ctx.fillStyle = st.cor;
-    ctx.beginPath(); ctx.arc(bal*0.3, 0, z.r, 0, 7); ctx.fill();
-    ctx.fillStyle = st.escuro;
-    ctx.beginPath(); ctx.arc(bal*0.3, 0, z.r-5 < 5 ? 5 : z.r-5, 0, 7); ctx.fill();
-    const da = Math.atan2(player.y - z.y, player.x - z.x);
-    ctx.rotate(da);
-    ctx.fillStyle = '#ff2222';
-    ctx.beginPath(); ctx.arc(z.r*0.4, -5, 3, 0, 7); ctx.fill();
-    ctx.beginPath(); ctx.arc(z.r*0.4, 5, 3, 0, 7); ctx.fill();
-    ctx.strokeStyle = st.cor; ctx.lineWidth = 5; ctx.lineCap = 'round';
-    const reach = 6 + Math.sin(z.wob*1.4)*4;
-    ctx.beginPath(); ctx.moveTo(4, -z.r*0.6); ctx.lineTo(z.r+reach, -z.r*0.6); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(4, z.r*0.6); ctx.lineTo(z.r+reach, z.r*0.6); ctx.stroke();
+    ctx.fillRect(-9,-h*0.85,18,8);
+    // braços estendidos p/ frente (perseguindo)
+    ctx.strokeStyle = st.cor; ctx.lineWidth = 7;
+    const reach = 14 + Math.sin(z.wob*1.4)*4;
+    ctx.beginPath(); ctx.moveTo(2,-h*0.75); ctx.lineTo(20+reach,-h*0.68+wob); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(2,-h*0.68); ctx.lineTo(20+reach*0.8,-h*0.58+wob); ctx.stroke();
+    ctx.fillStyle = st.cor;
+    ctx.beginPath(); ctx.arc(22+reach,-h*0.68+wob,4,0,7); ctx.fill();
+    // cabeça lateral
+    ctx.fillStyle = st.cor;
+    ctx.beginPath(); ctx.ellipse(4,-h+8,9,10,0,0,7); ctx.fill();
+    // boca aberta + olhos vermelhos
+    ctx.fillStyle = '#2a0d0d'; ctx.beginPath(); ctx.ellipse(11,-h+12,3,5,0,0,7); ctx.fill();
+    ctx.fillStyle = '#ff2222'; ctx.beginPath(); ctx.arc(5,-h+6,2.2,0,7); ctx.fill();
+    // cabelo ralo / feridas
+    ctx.fillStyle = 'rgba(60,10,10,.7)';
+    ctx.fillRect(-3,-h-1,6,3);
     if (z.tipo === 'brute') {
       ctx.fillStyle = '#3a2c22';
-      for (let s = -1; s <= 1; s++) {
-        ctx.beginPath(); ctx.arc(-6, s*10, 4, 0, 7); ctx.fill();
-      }
+      ctx.beginPath(); ctx.arc(-8,-h*0.6,5,0,7); ctx.fill();
+      ctx.beginPath(); ctx.arc(-8,-h*0.45,5,0,7); ctx.fill();
     }
     ctx.restore();
     if (z.hp < z.maxHp) {
-      ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(z.x-18, z.y-z.r-12, 36, 5);
-      ctx.fillStyle = '#ff5b5b'; ctx.fillRect(z.x-17, z.y-z.r-11, 34*(z.hp/z.maxHp), 3);
+      ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(z.x-20,z.y-h-14,40,5);
+      ctx.fillStyle = '#ff5b5b'; ctx.fillRect(z.x-19,z.y-h-13,38*(z.hp/z.maxHp),3);
     }
   }
 }
@@ -749,40 +699,47 @@ function draw() {
   drawBackground(t);
   for (const b of bullets) {
     ctx.fillStyle = '#ffe27a';
-    ctx.beginPath(); ctx.arc(b.x, b.y, b.r+2, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.r+2,0,7); ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,7); ctx.fill();
   }
   for (const p of parts) {
-    ctx.globalAlpha = Math.max(0, p.life/p.max);
+    ctx.globalAlpha = Math.max(0,p.life/p.max);
     ctx.fillStyle = p.cor;
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill();
   }
   ctx.globalAlpha = 1;
   if (player && state !== 'menu') drawZombies(t);
   if (player && state !== 'menu') drawPlayer(t);
   if (state === 'playing' || state === 'phaseclear') {
     ctx.strokeStyle = '#ffcf6e'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 12, 0, 7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(mouse.x,mouse.y,12,0,7); ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(mouse.x-18, mouse.y); ctx.lineTo(mouse.x-7, mouse.y);
-    ctx.moveTo(mouse.x+7, mouse.y); ctx.lineTo(mouse.x+18, mouse.y);
-    ctx.moveTo(mouse.x, mouse.y-18); ctx.lineTo(mouse.x, mouse.y-7);
-    ctx.moveTo(mouse.x, mouse.y+7); ctx.lineTo(mouse.x, mouse.y+18);
+    ctx.moveTo(mouse.x-18,mouse.y); ctx.lineTo(mouse.x-7,mouse.y);
+    ctx.moveTo(mouse.x+7,mouse.y); ctx.lineTo(mouse.x+18,mouse.y);
+    ctx.moveTo(mouse.x,mouse.y-18); ctx.lineTo(mouse.x,mouse.y-7);
+    ctx.moveTo(mouse.x,mouse.y+7); ctx.lineTo(mouse.x,mouse.y+18);
     ctx.stroke();
+    // linha de mira sutil da pistola
+    if (player && player.weapon === 'pistol') {
+      const s = shoulderPos();
+      ctx.strokeStyle = 'rgba(255,210,110,.25)'; ctx.lineWidth = 1;
+      ctx.setLineDash([6,6]);
+      ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(mouse.x,mouse.y); ctx.stroke();
+      ctx.setLineDash([]);
+    }
   }
 }
 
 let last = performance.now();
 function loop(now) {
-  const dt = Math.min(0.05, (now - last)/1000); last = now;
+  const dt = Math.min(0.05,(now-last)/1000); last = now;
   if (state === 'playing' || state === 'phaseclear') update(dt);
   else elapsed += dt;
   draw();
   requestAnimationFrame(loop);
 }
-resetPlayer(); bullets = []; zombies = []; parts = [];
-embers = [];
+resetPlayer(); bullets = []; zombies = []; parts = []; embers = [];
 for (let i = 0; i < 70; i++) embers.push({ x: Math.random()*W, y: Math.random()*H,
   s: 1+Math.random()*2.5, v: 12+Math.random()*30, o: Math.random()*7 });
 requestAnimationFrame(loop);
