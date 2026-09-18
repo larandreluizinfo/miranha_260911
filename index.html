@@ -3,43 +3,62 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Fazenda Apocalíptica SIDE-VIEW — Leon Realista</title>
+<title>Fazenda Apocalíptica SIDE-VIEW — 25 Fases + Bosses + Mercador</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { width:100%; height:100%; overflow:hidden; background:#0d0906;
     font-family:'Segoe UI',Arial,sans-serif; user-select:none; }
   #game { position:fixed; inset:0; width:100%; height:100%; display:block; cursor:crosshair; }
-  #hud { position:fixed; top:0; left:0; right:0; display:flex; gap:10px;
+  #hud { position:fixed; top:0; left:0; right:0; display:flex; gap:8px;
     justify-content:center; align-items:center; padding:10px; pointer-events:none;
     z-index:5; flex-wrap:wrap; }
   .pill { background:rgba(10,8,5,.72); border:1px solid rgba(255,150,60,.35);
-    color:#ffd9a8; padding:8px 14px; border-radius:999px; font-size:14px;
+    color:#ffd9a8; padding:7px 13px; border-radius:999px; font-size:13px;
     font-weight:600; letter-spacing:.5px; backdrop-filter:blur(4px); }
-  #hpbar { width:170px; height:10px; background:#3a1512; border-radius:99px;
+  #hpbar { width:150px; height:10px; background:#3a1512; border-radius:99px;
     overflow:hidden; display:inline-block; vertical-align:middle; margin-left:8px; }
   #hpfill { height:100%; width:100%; background:linear-gradient(90deg,#ff3b30,#ffcc00); transition:width .2s; }
+  #bossWrap { position:fixed; top:56px; left:50%; transform:translateX(-50%); width:min(600px,86vw);
+    z-index:6; display:none; text-align:center; }
+  #bossName { color:#ff8080; font-weight:800; font-size:14px; letter-spacing:1px; text-shadow:0 2px 8px #000; }
+  #bossBar { height:12px; background:#2a0d0d; border:1px solid #ff5555; border-radius:99px; overflow:hidden; margin-top:4px; }
+  #bossFill { height:100%; width:100%; background:linear-gradient(90deg,#ff0000,#ff8800); transition:width .15s; }
   #overlay { position:fixed; inset:0; display:flex; align-items:center;
-    justify-content:center; z-index:10; background:rgba(5,3,2,.72); backdrop-filter:blur(3px); }
+    justify-content:center; z-index:10; background:rgba(5,3,2,.74); backdrop-filter:blur(3px); }
   #overlay.hidden { display:none; }
-  .card { max-width:620px; width:92%; background:linear-gradient(180deg,#1d130c,#100b07);
-    border:1px solid #ff963c55; border-radius:16px; padding:28px; text-align:center;
+  .card { max-width:660px; width:93%; background:linear-gradient(180deg,#1d130c,#100b07);
+    border:1px solid #ff963c55; border-radius:16px; padding:24px; text-align:center;
     color:#ffe6c4; box-shadow:0 20px 80px #000; max-height:92vh; overflow:auto; }
-  .card h1 { font-size:28px; margin-bottom:8px; color:#ffb14e; }
-  .card h2 { font-size:22px; margin-bottom:8px; color:#ffb14e; }
-  .card p { font-size:15px; line-height:1.55; color:#e8c9a0; margin:8px 0; }
+  .card h1 { font-size:26px; margin-bottom:6px; color:#ffb14e; }
+  .card h2 { font-size:21px; margin-bottom:6px; color:#ffb14e; }
+  .card p { font-size:14px; line-height:1.5; color:#e8c9a0; margin:7px 0; }
   .leon-badge { display:inline-block; background:#1c3a5e; border:1px solid #6ea8ff;
-    color:#cfe4ff; padding:6px 14px; border-radius:999px; font-size:13px;
-    font-weight:700; margin-bottom:6px; letter-spacing:.5px; }
-  .keys { display:inline-block; text-align:left; margin:10px auto; font-size:14px;
-    background:#00000055; padding:12px 16px; border-radius:10px; border:1px solid #ffffff18; }
+    color:#cfe4ff; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; margin-bottom:6px; }
+  .keys { display:inline-block; text-align:left; margin:8px auto; font-size:13px;
+    background:#00000055; padding:10px 14px; border-radius:10px; border:1px solid #ffffff18; }
   .keys b { color:#ffd166; }
-  button { margin-top:14px; background:linear-gradient(180deg,#ff9a3c,#e0621a);
-    border:none; color:#1d0e04; font-weight:800; font-size:17px; padding:13px 34px;
+  button { margin-top:12px; background:linear-gradient(180deg,#ff9a3c,#e0621a);
+    border:none; color:#1d0e04; font-weight:800; font-size:16px; padding:12px 30px;
     border-radius:999px; cursor:pointer; letter-spacing:.5px; }
   button:hover { filter:brightness(1.12); }
+  button:disabled { filter:grayscale(1); opacity:.5; cursor:default; }
+  .diffRow { display:flex; gap:8px; justify-content:center; margin:10px 0; flex-wrap:wrap; }
+  .diffBtn { padding:9px 16px; font-size:13px; border-radius:999px; margin-top:0;
+    background:#222; color:#ccc; border:2px solid #444; }
+  .diffBtn.sel-facil { border-color:#5dd35d; color:#c8ffc8; background:#123212; }
+  .diffBtn.sel-normal { border-color:#6ea8ff; color:#d4e6ff; background:#16294d; }
+  .diffBtn.sel-dificil { border-color:#ff9a3c; color:#ffe0b8; background:#4d2a10; }
+  .diffBtn.sel-impossivel { border-color:#ff3b30; color:#ffc4c4; background:#4d1010; }
+  .shopGrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; }
+  @media (max-width:560px){ .shopGrid{ grid-template-columns:1fr; } }
+  .item { background:#00000066; border:1px solid #ff963c44; border-radius:12px; padding:10px; text-align:left; }
+  .item b { color:#ffd166; font-size:14px; }
+  .item small { color:#c9a87f; display:block; margin:3px 0 6px; font-size:12px; }
+  .buyBtn { padding:7px 14px; font-size:13px; margin-top:4px; }
+  #coinsBig { font-size:20px; color:#ffe27a; font-weight:800; }
   #toast { position:fixed; top:64px; left:50%; transform:translateX(-50%);
-    background:rgba(0,0,0,.7); color:#ffd166; padding:10px 22px; border-radius:999px;
-    font-weight:700; z-index:6; display:none; border:1px solid #ffd16655; white-space:nowrap; }
+    background:rgba(0,0,0,.75); color:#ffd166; padding:10px 22px; border-radius:999px;
+    font-weight:700; z-index:6; display:none; border:1px solid #ffd16655; white-space:nowrap; max-width:94vw; overflow:hidden; text-overflow:ellipsis; }
   #dmgflash { position:fixed; inset:0; pointer-events:none; z-index:7; opacity:0;
     background:radial-gradient(ellipse at center, transparent 55%, rgba(255,0,0,.55) 100%); }
   #musicBtn { position:fixed; bottom:16px; right:16px; z-index:8;
@@ -51,724 +70,656 @@
 <body>
 <canvas id="game"></canvas>
 <div id="hud">
-  <div class="pill">FASE <span id="hFase">–</span>/5</div>
+  <div class="pill">FASE <span id="hFase">–</span>/25</div>
+  <div class="pill">DIF <span id="hDiff">NORMAL</span></div>
   <div class="pill">ZUMBIS <span id="hZomb">–</span></div>
   <div class="pill">ABATES <span id="hKills">0</span></div>
+  <div class="pill">🪙 <span id="hCoins">0</span></div>
   <div class="pill">VIDA <span id="hpbar"><span id="hpfill"></span></span></div>
   <div class="pill">ARMA <span id="hArma">PISTOLA</span></div>
-  <div class="pill">LEON ★ SIDE-VIEW</div>
 </div>
+<div id="bossWrap"><div id="bossName">BOSS</div><div id="bossBar"><div id="bossFill"></div></div></div>
 <div id="toast"></div>
 <div id="dmgflash"></div>
 <button id="musicBtn">♪ SURF MUSIC: ON</button>
-<div id="overlay">
-  <div class="card" id="cardMenu">
-    <div class="leon-badge">★ LEON REALISTA — VISÃO LATERAL ★</div>
-    <h1>FAZENDA APOCALÍPTICA</h1>
-    <p>Agora em <b>visão de lado</b>! Leon corre pela fazenda, mira com o mouse e troca de arma sozinho:</p>
-    <div class="keys">
-      <div><b>A / D ou Setas</b> — correr</div>
-      <div><b>W / Espaço / Seta cima</b> — pular</div>
-      <div><b>Mouse</b> — mirar &nbsp;•&nbsp; <b>Clique</b> — atirar <b>pistola</b></div>
-      <div><b>F ou botão direito</b> — guarda a pistola e ataca só de <b>faca</b></div>
-      <div><b>M</b> — música surf &nbsp;•&nbsp; <b>R</b> — reiniciar</div>
-    </div>
-    <p>Quando mira = só pistola na mão. Quando aperta F = só faca. Como você pediu!</p>
-    <button id="btnStart">COMEÇAR A MISSÃO</button>
-  </div>
-</div>
+<div id="overlay"><div class="card" id="cardMenu"></div></div>
 <script>
 (() => {
 "use strict";
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const hFase = document.getElementById('hFase');
+const hDiff = document.getElementById('hDiff');
 const hZomb = document.getElementById('hZomb');
 const hKills = document.getElementById('hKills');
+const hCoins = document.getElementById('hCoins');
 const hpfill = document.getElementById('hpfill');
 const hArma = document.getElementById('hArma');
 const overlay = document.getElementById('overlay');
 const cardMenu = document.getElementById('cardMenu');
-const btnStart = document.getElementById('btnStart');
 const toast = document.getElementById('toast');
 const dmgflash = document.getElementById('dmgflash');
 const musicBtn = document.getElementById('musicBtn');
+const bossWrap = document.getElementById('bossWrap');
+const bossName = document.getElementById('bossName');
+const bossFill = document.getElementById('bossFill');
 
-let W = 0, H = 0, DPR = 1;
-function resize() {
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
-  W = window.innerWidth; H = window.innerHeight;
-  canvas.width = Math.floor(W * DPR); canvas.height = Math.floor(H * DPR);
-  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-}
-window.addEventListener('resize', resize); resize();
-const groundY = () => H * 0.82;
+let W=0,H=0,DPR=1;
+function resize(){ DPR=Math.min(window.devicePixelRatio||1,2); W=window.innerWidth; H=window.innerHeight;
+  canvas.width=Math.floor(W*DPR); canvas.height=Math.floor(H*DPR); ctx.setTransform(DPR,0,0,DPR,0,0); }
+window.addEventListener('resize',resize); resize();
+const groundY = () => H*0.82;
+const TOTAL = 25;
 
-// ---------- SFX ----------
-let AC = null;
-function audio() {
-  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
-  if (AC.state === 'suspended') AC.resume();
-  return AC;
-}
-function beep(freq, dur, type, vol) {
-  try {
-    const ac = audio();
-    const o = ac.createOscillator(), g = ac.createGain();
-    o.type = type || 'square'; o.frequency.value = freq;
-    g.gain.value = vol || 0.06;
-    o.connect(g); g.connect(ac.destination);
-    o.start(); g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + (dur || 0.08));
-    o.stop(ac.currentTime + (dur || 0.08));
-  } catch (e) {}
-}
-const sfxShoot = () => beep(700 + Math.random()*300, 0.07, 'square', 0.05);
-const sfxKnife = () => beep(220, 0.1, 'sawtooth', 0.07);
-const sfxHit   = () => beep(140, 0.1, 'sawtooth', 0.08);
-const sfxDie   = () => beep(90, 0.25, 'sawtooth', 0.09);
-const sfxHurt  = () => beep(180, 0.2, 'square', 0.09);
+// ---------- DIFICULDADES ----------
+const DIFFS = {
+  facil:      { nome:'FÁCIL',      multHp:0.65, multDmg:0.6,  multSpeed:0.9,  maxAliveBonus:0, coinBonus:1.2 },
+  normal:     { nome:'NORMAL',     multHp:1.0,  multDmg:1.0,  multSpeed:1.0,  maxAliveBonus:0, coinBonus:1.0 },
+  dificil:    { nome:'DIFÍCIL',    multHp:1.35, multDmg:1.45, multSpeed:1.06, maxAliveBonus:1, coinBonus:1.3 },
+  impossivel: { nome:'IMPOSSÍVEL', multHp:1.9,  multDmg:2.1,  multSpeed:1.14, maxAliveBonus:2, coinBonus:1.6 },
+};
+let diffKey = 'normal';
+const diff = () => DIFFS[diffKey];
 
-// ---------- MÚSICA SURF ----------
-let musicOn = true, musicTimer = null, step = 0, nextTime = 0, musicBus = null;
-const BPM = 168, SPB = 60 / BPM / 2;
-const BASSLINE = [82.4,82.4,82.4,82.4, 82.4,82.4,110,110, 82.4,82.4,98,98, 123.5,123.5,98,98];
-const LEAD = [659,0,659,784, 0,659,0,494, 587,0,587,659, 0,587,494,0,
-  659,0,659,784, 880,784,659,587, 494,0,587,659, 587,494,82.4,0];
-function initMusicBus() {
-  const ac = audio();
-  if (musicBus) return;
-  musicBus = ac.createGain(); musicBus.gain.value = 0.5;
-  const delay = ac.createDelay(1); delay.delayTime.value = 0.23;
-  const fb = ac.createGain(); fb.gain.value = 0.32;
-  const wet = ac.createGain(); wet.gain.value = 0.35;
-  delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(ac.destination);
-  musicBus.connect(ac.destination); musicBus.connect(delay);
+// ---------- FASES 1-25 (boss a cada 5) ----------
+function genPhase(n) {
+  const isBoss = n % 5 === 0;
+  const total = isBoss ? Math.min(10 + n, 30) : Math.min(6 + n*2, 38);
+  const interval = Math.max(0.32, 1.5 - n*0.045);
+  const maxAlive = Math.min(4 + Math.floor(n/2), 11) + diff().maxAliveBonus;
+  let pool;
+  if (n <= 3) pool = ['normal','normal','normal'];
+  else if (n <= 7) pool = ['normal','normal','runner'];
+  else if (n <= 12) pool = ['normal','runner','runner'];
+  else if (n <= 18) pool = ['normal','runner','brute'];
+  else pool = ['runner','brute','brute','normal'];
+  return { total, interval, maxAlive, pool, isBoss };
 }
-function noiseBurst(t, dur, vol, freq) {
-  const ac = audio();
-  const len = Math.floor(ac.sampleRate * dur);
-  const buf = ac.createBuffer(1, len, ac.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * (1 - i/len);
-  const src = ac.createBufferSource(); src.buffer = buf;
-  const f = ac.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = freq || 1000;
-  const g = ac.createGain(); g.gain.value = vol;
-  src.connect(f); f.connect(g); g.connect(musicBus);
-  src.start(t);
-}
-function playNote(t, freq, dur, type, vol) {
-  if (!freq) return;
-  const ac = audio();
-  const o = ac.createOscillator(), g = ac.createGain();
-  o.type = type; o.frequency.value = freq;
-  const lfo = ac.createOscillator(); lfo.frequency.value = 6;
-  const lg = ac.createGain(); lg.gain.value = 6;
-  lfo.connect(lg); lg.connect(o.frequency);
-  g.gain.setValueAtTime(vol, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-  o.connect(g); g.connect(musicBus);
-  o.start(t); o.stop(t + dur + 0.02);
-  lfo.start(t); lfo.stop(t + dur + 0.02);
-}
-function scheduleStep(s, t) {
-  const i = s % 16;
-  const pos = s % 4;
-  if (pos === 0 || pos === 2) {
-    const ac = audio();
-    const o = ac.createOscillator(), g = ac.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(120, t);
-    o.frequency.exponentialRampToValueAtTime(40, t + 0.12);
-    g.gain.setValueAtTime(0.5, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
-    o.connect(g); g.connect(musicBus); o.start(t); o.stop(t + 0.16);
-  }
-  if (pos === 1 || pos === 3) noiseBurst(t, 0.12, 0.35, 1800);
-  noiseBurst(t, 0.03, 0.08, 6000);
-  playNote(t, BASSLINE[i], 0.22, 'triangle', 0.28);
-  if (s % 2 === 0) playNote(t, BASSLINE[i]*2, 0.1, 'square', 0.06);
-  playNote(t, LEAD[s % LEAD.length], 0.21, 'square', 0.11);
-}
-function scheduler() {
-  if (!musicOn) return;
-  const ac = audio();
-  while (nextTime < ac.currentTime + 0.25) { scheduleStep(step, nextTime); nextTime += SPB; step++; }
-}
-function startMusic() {
-  try {
-    initMusicBus(); audio();
-    if (musicTimer) clearInterval(musicTimer);
-    step = 0; nextTime = audio().currentTime + 0.1;
-    musicTimer = setInterval(scheduler, 80);
-    musicBtn.textContent = '♪ SURF MUSIC: ON'; musicBtn.classList.remove('off');
-  } catch(e){}
-}
-function stopMusic() {
-  if (musicTimer) clearInterval(musicTimer); musicTimer = null;
-  musicBtn.textContent = '♪ SURF MUSIC: OFF'; musicBtn.classList.add('off');
-}
-function toggleMusic() { musicOn = !musicOn; if (musicOn) startMusic(); else stopMusic(); }
-musicBtn.onclick = toggleMusic;
-
-// ---------- ESTADO SIDE-VIEW ----------
-const FASES = [
-  { total: 8,  interval: 1.5, maxAlive: 4,  pool: ['normal','normal','normal'] },
-  { total: 12, interval: 1.2, maxAlive: 6,  pool: ['normal','normal','runner'] },
-  { total: 16, interval: 1.0, maxAlive: 7,  pool: ['normal','runner','runner'] },
-  { total: 20, interval: 0.85,maxAlive: 8,  pool: ['normal','runner','brute'] },
-  { total: 28, interval: 0.65,maxAlive: 10, pool: ['normal','runner','brute','runner','brute'] },
+const BOSS_DEFS = [
+  { nome:'ESPANTALHO MUTANTE',   hp:50,  speed:58, dmg:22, h:120, cor:'#8f7a3a', esc:'#4a3d15', camisa:'#5a4a20' },
+  { nome:'FAZENDEIRO DA SERRA',  hp:90,  speed:62, dmg:28, h:130, cor:'#9a5a4a', esc:'#4a241c', camisa:'#3d2f26' },
+  { nome:'BOI DEMONÍACO',        hp:135, speed:70, dmg:32, h:140, cor:'#6a4a5a', esc:'#33202a', camisa:'#2c1a24' },
+  { nome:'CEIFADOR DO MILHARAL', hp:185, speed:76, dmg:38, h:150, cor:'#5a7a4a', esc:'#24331c', camisa:'#1c2a15' },
+  { nome:'REI ZUMBI DA FAZENDA', hp:260, speed:82, dmg:45, h:165, cor:'#7a2a2a', esc:'#3d1010', camisa:'#2a0d0d' },
 ];
 const ZSTATS = {
-  normal: { hp: 3, speed: 70,  dmg: 10, h: 72, cor:'#7da05a', esc:'#3d5527', camisa:'#4a5a3a' },
-  runner: { hp: 2, speed: 165, dmg: 8,  h: 66, cor:'#b8c44a', esc:'#5d6620', camisa:'#6b6b2e' },
-  brute:  { hp: 11,speed: 48,  dmg: 22, h: 102,cor:'#8a6f5c', esc:'#4a382c', camisa:'#3d2f26' },
+  normal: { hp:3, speed:70,  dmg:10, h:72,  cor:'#7da05a', esc:'#3d5527', camisa:'#4a5a3a', coins:10 },
+  runner: { hp:2, speed:165, dmg:8,  h:66,  cor:'#b8c44a', esc:'#5d6620', camisa:'#6b6b2e', coins:12 },
+  brute:  { hp:11,speed:48,  dmg:22, h:102, cor:'#8a6f5c', esc:'#4a382c', camisa:'#3d2f26', coins:25 },
 };
 const GRAV = 2100, JUMP_V = 780;
 
-let state = 'menu';
-let player, bullets, zombies, parts, embers;
-let fase = 0, spawned = 0, kills = 0, killsFase = 0;
-let spawnTimer = 0, elapsed = 0;
-let mouse = { x: innerWidth*0.7, y: innerHeight*0.4, down: false };
-let keys = {};
-let shootCd = 0, knifeCd = 0, knifeTimer = 0, walkPhase = 0, clearTimer = 0;
+// ---------- AUDIO ----------
+let AC=null;
+function audio(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume(); return AC; }
+function beep(freq,dur,type,vol){ try{ const ac=audio(); const o=ac.createOscillator(),g=ac.createGain();
+  o.type=type||'square'; o.frequency.value=freq; g.gain.value=vol||0.06; o.connect(g); g.connect(ac.destination);
+  o.start(); g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+(dur||0.08)); o.stop(ac.currentTime+(dur||0.08)); }catch(e){} }
+const sfxShoot=()=>beep(700+Math.random()*300,0.07,'square',0.05);
+const sfxKnife=()=>beep(220,0.1,'sawtooth',0.07);
+const sfxHit=()=>beep(140,0.1,'sawtooth',0.08);
+const sfxDie=()=>beep(90,0.25,'sawtooth',0.09);
+const sfxHurt=()=>beep(180,0.2,'square',0.09);
+const sfxCoin=()=>{beep(950,0.07,'square',0.05); setTimeout(()=>beep(1400,0.09,'square',0.05),70);};
+const sfxBuy=()=>{beep(600,0.1,'sine',0.08); setTimeout(()=>beep(900,0.12,'sine',0.08),100);};
+const sfxBoss=()=>{beep(70,0.5,'sawtooth',0.12); setTimeout(()=>beep(55,0.6,'sawtooth',0.12),250);};
 
-function resetPlayer() {
-  player = { x: W/2, y: groundY(), vx: 0, vy: 0, hp: 100, maxHp: 100, speed: 340,
-    face: 1, aim: 0, weapon: 'pistol', muzzle: 0, onGround: true, moving: false };
+// música surf
+let musicOn=true,musicTimer=null,step=0,nextTime=0,musicBus=null;
+const BPM=168,SPB=60/BPM/2;
+const BASSLINE=[82.4,82.4,82.4,82.4,82.4,82.4,110,110,82.4,82.4,98,98,123.5,123.5,98,98];
+const LEAD=[659,0,659,784,0,659,0,494,587,0,587,659,0,587,494,0,659,0,659,784,880,784,659,587,494,0,587,659,587,494,82.4,0];
+function initMusicBus(){ const ac=audio(); if(musicBus)return; musicBus=ac.createGain(); musicBus.gain.value=0.5;
+  const delay=ac.createDelay(1); delay.delayTime.value=0.23; const fb=ac.createGain(); fb.gain.value=0.32;
+  const wet=ac.createGain(); wet.gain.value=0.35; delay.connect(fb); fb.connect(delay); delay.connect(wet);
+  wet.connect(ac.destination); musicBus.connect(ac.destination); musicBus.connect(delay); }
+function noiseBurst(t,dur,vol,freq){ const ac=audio(); const len=Math.floor(ac.sampleRate*dur);
+  const buf=ac.createBuffer(1,len,ac.sampleRate); const d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);
+  const src=ac.createBufferSource(); src.buffer=buf; const f=ac.createBiquadFilter(); f.type='highpass'; f.frequency.value=freq||1000;
+  const g=ac.createGain(); g.gain.value=vol; src.connect(f); f.connect(g); g.connect(musicBus); src.start(t); }
+function playNote(t,freq,dur,type,vol){ if(!freq)return; const ac=audio(); const o=ac.createOscillator(),g=ac.createGain();
+  o.type=type; o.frequency.value=freq; const lfo=ac.createOscillator(); lfo.frequency.value=6;
+  const lg=ac.createGain(); lg.gain.value=6; lfo.connect(lg); lg.connect(o.frequency);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+  o.connect(g); g.connect(musicBus); o.start(t); o.stop(t+dur+0.02); lfo.start(t); lfo.stop(t+dur+0.02); }
+function scheduleStep(s,t){ const i=s%16,pos=s%4;
+  if(pos===0||pos===2){ const ac=audio(); const o=ac.createOscillator(),g=ac.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(120,t); o.frequency.exponentialRampToValueAtTime(40,t+0.12);
+    g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
+    o.connect(g); g.connect(musicBus); o.start(t); o.stop(t+0.16); }
+  if(pos===1||pos===3)noiseBurst(t,0.12,0.35,1800);
+  noiseBurst(t,0.03,0.08,6000);
+  playNote(t,BASSLINE[i],0.22,'triangle',0.28);
+  if(s%2===0)playNote(t,BASSLINE[i]*2,0.1,'square',0.06);
+  playNote(t,LEAD[s%LEAD.length],0.21,'square',0.11); }
+function scheduler(){ if(!musicOn)return; const ac=audio();
+  while(nextTime<ac.currentTime+0.25){ scheduleStep(step,nextTime); nextTime+=SPB; step++; } }
+function startMusic(){ try{ initMusicBus(); audio(); if(musicTimer)clearInterval(musicTimer);
+  step=0; nextTime=audio().currentTime+0.1; musicTimer=setInterval(scheduler,80);
+  musicBtn.textContent='♪ SURF MUSIC: ON'; musicBtn.classList.remove('off'); }catch(e){} }
+function stopMusic(){ if(musicTimer)clearInterval(musicTimer); musicTimer=null;
+  musicBtn.textContent='♪ SURF MUSIC: OFF'; musicBtn.classList.add('off'); }
+function toggleMusic(){ musicOn=!musicOn; if(musicOn)startMusic(); else stopMusic(); }
+musicBtn.onclick=toggleMusic;
+
+// ---------- ESTADO ----------
+let state='menu', player, bullets, zombies, parts, embers;
+let fase=0, spawned=0, kills=0, killsFase=0, bossSpawned=false, activeBoss=null;
+let spawnTimer=0, elapsed=0;
+let mouse={x:innerWidth*0.7,y:innerHeight*0.4,down:false};
+let keys={};
+let shootCd=0, knifeCd=0, knifeTimer=0, walkPhase=0, clearTimer=0;
+
+function resetPlayer(){
+  player={ x:W/2, y:groundY(), vy:0, hp:100, maxHp:100, speed:340, face:1, aim:0,
+    weapon:'pistol', muzzle:0, onGround:true, moving:false, coins:0,
+    up:{ dPist:0, dFaca:0, armor:0, spd:0, hpBonus:0 } };
 }
-function startGame() {
-  resetPlayer(); bullets = []; zombies = []; parts = []; embers = [];
-  for (let i = 0; i < 70; i++) embers.push({ x: Math.random()*W, y: Math.random()*H,
-    s: 1+Math.random()*2.5, v: 12+Math.random()*30, o: Math.random()*Math.PI*2 });
-  fase = 0; kills = 0; elapsed = 0;
-  overlay.classList.add('hidden');
-  if (musicOn) startMusic();
+const pistolDmg=()=>1+player.up.dPist;
+const knifeDmg=()=>3+player.up.dFaca;
+const armorRed=()=>Math.min(0.6,player.up.armor*0.12);
+
+function startGame(){
+  resetPlayer(); bullets=[]; zombies=[]; parts=[]; embers=[];
+  for(let i=0;i<70;i++)embers.push({x:Math.random()*W,y:Math.random()*H,s:1+Math.random()*2.5,v:12+Math.random()*30,o:Math.random()*7});
+  fase=0; kills=0; elapsed=0; bossSpawned=false; activeBoss=null;
+  overlay.classList.add('hidden'); bossWrap.style.display='none';
+  if(musicOn)startMusic();
   startPhase(1);
 }
-function startPhase(n) {
-  fase = n; spawned = 0; killsFase = 0; zombies = []; bullets = [];
-  spawnTimer = 0.4;
-  if (n > 1) player.hp = Math.min(player.maxHp, player.hp + 30);
-  state = 'playing';
-  showToast('FASE ' + n + ' — Leon, limpe ' + FASES[n-1].total + ' zumbis!');
+function startPhase(n){
+  fase=n; spawned=0; killsFase=0; zombies=[]; bullets=[]; bossSpawned=false; activeBoss=null;
+  bossWrap.style.display='none';
+  spawnTimer=0.6;
+  if(n>1){ player.hp=Math.min(player.maxHp,player.hp+30); }
+  // dificuldade sobe levemente por nível (mesmo no fácil)
+  state='playing';
+  const cfg=genPhase(n);
+  if(cfg.isBoss){ showToast('☠ FASE '+n+' — BOSS: '+BOSS_DEFS[n/5-1].nome+'!',3200); sfxBoss(); }
+  else showToast('FASE '+n+'/25 ['+diff().nome+'] — '+cfg.total+' zumbis!',2600);
   updateHUD();
 }
-function showToast(msg, ms) {
-  toast.textContent = msg; toast.style.display = 'block';
-  clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => toast.style.display = 'none', ms || 2600);
-}
-function endCard(titulo, texto, btn) {
-  cardMenu.innerHTML = '<div class="leon-badge">★ LEON ★</div><h2>' + titulo + '</h2><p>' + texto + '</p>' +
-    '<button id="btnAgain">' + btn + '</button><p style="font-size:13px">ou pressione R</p>';
+function showToast(msg,ms){ toast.textContent=msg; toast.style.display='block';
+  clearTimeout(showToast._t); showToast._t=setTimeout(()=>toast.style.display='none',ms||2600); }
+function endCard(titulo,texto,btn){
+  cardMenu.innerHTML='<div class="leon-badge">★ LEON ★</div><h2>'+titulo+'</h2><p>'+texto+'</p>'+
+    '<button id="btnAgain">'+btn+'</button><p style="font-size:13px">ou pressione R • dificuldade: '+diff().nome+'</p>';
   overlay.classList.remove('hidden');
-  document.getElementById('btnAgain').onclick = startGame;
+  document.getElementById('btnAgain').onclick=startGame;
 }
-function spawnZombie() {
-  const cfg = FASES[fase-1];
-  const tipo = cfg.pool[Math.floor(Math.random()*cfg.pool.length)];
-  const st = ZSTATS[tipo];
-  const lado = Math.random() < 0.5 ? -1 : 1;
-  const x = lado < 0 ? -40 : W + 40;
-  zombies.push({ x, y: groundY(), tipo, hp: st.hp + (fase >= 4 ? 1 : 0),
-    maxHp: st.hp + (fase >= 4 ? 1 : 0), speed: st.speed*(0.85+Math.random()*0.35)+fase*3,
-    h: st.h, dmg: st.dmg, hitCd: 0, wob: Math.random()*10, wobV: 6+Math.random()*4 });
+
+// ---------- MENU + DIFICULDADE ----------
+function showMenu(){
+  state='menu';
+  const btns = Object.keys(DIFFS).map(k=>
+    '<button class="diffBtn '+(k===diffKey?'sel-'+k:'')+'" data-d="'+k+'">'+DIFFS[k].nome+'</button>').join('');
+  cardMenu.innerHTML =
+    '<div class="leon-badge">★ LEON REALISTA — 25 FASES ★</div>'+
+    '<h1>FAZENDA APOCALÍPTICA</h1>'+
+    '<p><b>25 fases</b>! Boss a cada 5 fases (5, 10, 15, 20, 25). Mercador no fim de cada fase <b>a partir da 10</b>.</p>'+
+    '<p>Escolha a dificuldade:</p><div class="diffRow">'+btns+'</div>'+
+    '<p style="font-size:12px" id="diffDesc"></p>'+
+    '<div class="keys"><div><b>A/D</b> correr • <b>W/Espaço</b> pular</div>'+
+    '<div><b>Mouse+clique</b> pistola • <b>F/botão direito</b> faca</div>'+
+    '<div><b>M</b> música • <b>R</b> reiniciar</div></div>'+
+    '<div><button id="btnStart">COMEÇAR A MISSÃO</button></div>';
+  overlay.classList.remove('hidden');
+  const descs={facil:'Zumbis fracos, mais moedas. Ideal para aprender.',
+    normal:'Equilíbrio clássico.', dificil:'Zumbis com +35% vida e +45% dano. +30% moedas.',
+    impossivel:'Só para lendas: quase 2x vida e dano. +60% moedas!'};
+  const dd=document.getElementById('diffDesc'); dd.textContent=descs[diffKey];
+  cardMenu.querySelectorAll('.diffBtn').forEach(b=>b.onclick=()=>{ diffKey=b.dataset.d; audio(); beep(500,0.08,'square',0.06); showMenu(); });
+  document.getElementById('btnStart').onclick=()=>{ audio(); if(musicOn)startMusic(); startGame(); };
+}
+
+// ---------- MERCADOR (fase 10+) ----------
+const SHOP=[
+  { id:'hp',   nome:'❤️ Vida Máx +25', desc:'Aumenta vida máxima e cura 25', base:100 },
+  { id:'pist', nome:'🔫 Pistola +1',    desc:'+1 dano por tiro', base:180 },
+  { id:'faca', nome:'🔪 Faca +1',       desc:'+1 dano na facada', base:140 },
+  { id:'cole', nome:'🦺 Colete +12%',   desc:'-12% dano recebido (máx 60%)', base:120 },
+  { id:'bota', nome:'🥾 Botas velozes', desc:'+15 velocidade de corrida', base:80 },
+  { id:'cura', nome:'💊 Cura total',    desc:'Enche toda a vida agora', base:60 },
+];
+function priceOf(it){
+  const lvl = it.id==='hp'?player.up.hpBonus/25 : it.id==='pist'?player.up.dPist : it.id==='faca'?player.up.dFaca
+    : it.id==='cole'?player.up.armor : it.id==='bota'?player.up.spd : 0;
+  if(it.id==='cura') return 60 + fase*2;
+  return Math.floor(it.base * (1 + lvl*0.6));
+}
+function openMerchant(){
+  state='merchant'; bossWrap.style.display='none';
+  beep(700,0.12,'sine',0.08); setTimeout(()=>beep(1000,0.15,'sine',0.08),130);
+  renderShop();
+  overlay.classList.remove('hidden');
+}
+function renderShop(){
+  const items = SHOP.map(it=>{
+    const p=priceOf(it);
+    const dis = (player.coins<p)?'disabled':'';
+    let extra='';
+    if(it.id==='cole') extra=' (atual: '+Math.round(armorRed()*100)+'%)';
+    if(it.id==='pist') extra=' (dano: '+pistolDmg()+')';
+    if(it.id==='faca') extra=' (dano: '+knifeDmg()+')';
+    return '<div class="item"><b>'+it.nome+extra+'</b><small>'+it.desc+' — 🪙'+p+'</small>'+
+      '<button class="buyBtn" data-id="'+it.id+'" '+dis+'>COMPRAR</button></div>';
+  }).join('');
+  cardMenu.innerHTML='<div class="leon-badge">🛒 MERCADOR DA FAZENDA — FASE '+fase+' LIMPA!</div>'+
+    '<h2>“Ora, ora... tem moedas, tem negócio.”</h2>'+
+    '<p>Abates: '+kills+' • Vida: '+Math.round(player.hp)+'/'+player.maxHp+' • Pistola '+pistolDmg()+' • Faca '+knifeDmg()+' • Colete '+Math.round(armorRed()*100)+'%</p>'+
+    '<div id="coinsBig">🪙 '+player.coins+'</div>'+
+    '<div class="shopGrid">'+items+'</div>'+
+    '<button id="btnNext">IR PARA FASE '+(fase+1)+'/25 →</button>';
+  overlay.classList.remove('hidden');
+  cardMenu.querySelectorAll('.buyBtn').forEach(b=>b.onclick=()=>buy(b.dataset.id));
+  document.getElementById('btnNext').onclick=()=>{ overlay.classList.add('hidden'); startPhase(fase+1); };
+}
+function buy(id){
+  const it=SHOP.find(i=>i.id===id); const p=priceOf(it);
+  if(player.coins<p){ beep(150,0.2,'square',0.08); return; }
+  player.coins-=p; sfxBuy();
+  if(id==='hp'){ player.up.hpBonus+=25; player.maxHp+=25; player.hp=Math.min(player.maxHp,player.hp+25); }
+  if(id==='pist') player.up.dPist+=1;
+  if(id==='faca') player.up.dFaca+=1;
+  if(id==='cole'){ if(player.up.armor>=5){ player.coins+=p; showToast('Colete no máximo!',1500); renderShop(); updateHUD(); return; } player.up.armor+=1; }
+  if(id==='bota'){ player.up.spd+=1; player.speed+=15; }
+  if(id==='cura'){ player.hp=player.maxHp; }
+  showToast('Comprou: '+it.nome,1500);
+  renderShop(); updateHUD();
+}
+
+// ---------- SPAWN ----------
+function spawnZombie(){
+  const cfg=genPhase(fase); const D=diff();
+  // boss entra no meio da fase (depois de metade dos comuns)
+  if(cfg.isBoss && !bossSpawned && spawned>=Math.floor(cfg.total/2)){
+    const bi=fase/5-1, b=BOSS_DEFS[bi];
+    const x=Math.random()<0.5?-60:W+60;
+    const z={ x, y:groundY(), tipo:'boss', bossIdx:bi, nome:b.nome,
+      hp:Math.floor(b.hp*D.multHp*(1+fase*0.012)), dmg:Math.floor(b.dmg*D.multDmg),
+      speed:b.speed*D.multSpeed, h:b.h, cor:b.cor, esc:b.esc, camisa:b.camisa,
+      hitCd:0, wob:0, wobV:5, chargeCd:3, charging:0, maxHp:0 };
+    z.maxHp=z.hp; zombies.push(z); bossSpawned=true; activeBoss=z; spawned++;
+    sfxBoss(); showToast('☠ '+b.nome+' CHEGOU!',2500); updateHUD();
+    return;
+  }
+  const tipo=cfg.pool[Math.floor(Math.random()*cfg.pool.length)];
+  const st=ZSTATS[tipo];
+  const x=Math.random()<0.5?-40:W+40;
+  const hpBonus=Math.floor(fase/5);
+  zombies.push({ x, y:groundY(), tipo, hp:Math.floor((st.hp+hpBonus)*D.multHp)||1,
+    maxHp:Math.floor((st.hp+hpBonus)*D.multHp)||1,
+    speed:st.speed*D.multSpeed*(0.85+Math.random()*0.35)+fase*2,
+    h:st.h, dmg:Math.max(1,Math.floor(st.dmg*D.multDmg*(1+fase*0.008))),
+    hitCd:0, wob:Math.random()*10, wobV:6+Math.random()*4 });
   spawned++;
 }
-function updateHUD() {
-  hFase.textContent = fase || '–';
-  const cfg = FASES[(fase||1)-1];
-  hZomb.textContent = state === 'playing' ? ((cfg.total - killsFase) + ' esq.') : '–';
-  hKills.textContent = kills;
-  hpfill.style.width = Math.max(0, player ? player.hp : 0) + '%';
-  if (player) hArma.textContent = player.weapon === 'knife' ? 'FACA!' : 'PISTOLA';
+function updateHUD(){
+  hFase.textContent=fase||'–'; hDiff.textContent=diff().nome;
+  const cfg=genPhase(fase||1);
+  const restantes=cfg.total-killsFase;
+  hZomb.textContent=state==='playing'?(restantes+' esq.'+(cfg.isBoss?' ☠':'')):'–';
+  hKills.textContent=kills; hCoins.textContent=player?player.coins:0;
+  hpfill.style.width=Math.max(0,player?player.hp/player.maxHp*100:0)+'%';
+  if(player)hArma.textContent=player.weapon==='knife'?'FACA!':'PISTOLA';
+  if(activeBoss&&!activeBoss.morto){ bossWrap.style.display='block';
+    bossName.textContent='☠ '+activeBoss.nome+' ☠';
+    bossFill.style.width=Math.max(0,activeBoss.hp/activeBoss.maxHp*100)+'%';
+  } else bossWrap.style.display='none';
 }
-function shoulderPos() { return { x: player.x, y: player.y - 62 }; }
-function shoot() {
-  const s = shoulderPos();
-  const a = player.aim; // world angle
-  const gx = s.x + Math.cos(a)*34, gy = s.y + Math.sin(a)*34;
-  bullets.push({ x: gx, y: gy, vx: Math.cos(a)*820, vy: Math.sin(a)*820, life: 1.2, r: 4 });
-  sfxShoot(); player.muzzle = 0.06;
-  for (let i = 0; i < 4; i++)
-    parts.push({ x: gx, y: gy, vx:(Math.random()-.5)*160, vy:(Math.random()-.5)*160, life:.25, max:.25, cor:'#ffcf6e', r:2 });
+
+// ---------- COMBATE ----------
+function shoulderPos(){ return { x:player.x, y:player.y-62 }; }
+function shoot(){
+  const s=shoulderPos(), a=player.aim;
+  const gx=s.x+Math.cos(a)*34, gy=s.y+Math.sin(a)*34;
+  bullets.push({x:gx,y:gy,vx:Math.cos(a)*820,vy:Math.sin(a)*820,life:1.2,r:4});
+  sfxShoot(); player.muzzle=0.06;
+  for(let i=0;i<4;i++)parts.push({x:gx,y:gy,vx:(Math.random()-.5)*160,vy:(Math.random()-.5)*160,life:.25,max:.25,cor:'#ffcf6e',r:2});
 }
-function knife() {
-  if (knifeCd > 0 || state !== 'playing') return;
-  knifeCd = 0.5; knifeTimer = 0.30;
-  player.weapon = 'knife'; // guarda a pistola, só faca na mão
-  sfxKnife(); updateHUD();
-  // dano frontal em leque
-  let acertou = false;
-  for (const z of zombies) {
-    const dx = (z.x - player.x) * player.face; // >0 = na frente
-    const dy = Math.abs((z.y - z.h/2) - (player.y - 50));
-    if (dx > -10 && dx < 105 && dy < 70) {
-      z.hp -= 3; acertou = true;
-      sangue(z.x, z.y - z.h/2, 10);
-      if (z.hp <= 0) matar(z); else sfxHit();
-    }
+function knife(){
+  if(knifeCd>0||state!=='playing')return;
+  knifeCd=0.5; knifeTimer=0.30; player.weapon='knife'; sfxKnife(); updateHUD();
+  for(const z of zombies){
+    const dx=(z.x-player.x)*player.face, zy=z.y-(z.h||70)/2;
+    const dy=Math.abs(zy-(player.y-50));
+    const range = z.tipo==='boss'?130:105;
+    if(dx>-10&&dx<range&&dy<80){ z.hp-=knifeDmg(); sangue(z.x,z.y-(z.h||70)/2,10);
+      if(z.hp<=0)matar(z); else sfxHit(); }
   }
-  const s = shoulderPos();
-  for (let i = 0; i < 8; i++) {
-    parts.push({ x: s.x + player.face*40, y: s.y + (Math.random()-.5)*20,
-      vx: player.face*(120+Math.random()*160), vy:(Math.random()-.5)*160, life:.2, max:.2, cor:'#fff', r:2 });
-  }
-  if (acertou) updateHUD();
+  const s=shoulderPos();
+  for(let i=0;i<8;i++)parts.push({x:s.x+player.face*40,y:s.y+(Math.random()-.5)*20,
+    vx:player.face*(120+Math.random()*160),vy:(Math.random()-.5)*160,life:.2,max:.2,cor:'#fff',r:2});
 }
-function sangue(x, y, n) {
-  for (let i = 0; i < (n||8); i++) {
-    const a = Math.random()*Math.PI*2, v = 60+Math.random()*220;
-    parts.push({ x, y, vx: Math.cos(a)*v, vy: Math.sin(a)*v - 80,
-      life:.5, max:.5, cor: Math.random()<.5 ? '#8fbf4d' : '#4c6b2a', r: 2+Math.random()*3 });
-  }
+function sangue(x,y,n){ for(let i=0;i<(n||8);i++){ const a=Math.random()*Math.PI*2,v=60+Math.random()*220;
+  parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-80,life:.5,max:.5,cor:Math.random()<.5?'#8fbf4d':'#4c6b2a',r:2+Math.random()*3}); } }
+function matar(z){
+  z.morto=true; kills++; killsFase++;
+  let gain = z.tipo==='boss'?200:(ZSTATS[z.tipo]?ZSTATS[z.tipo].coins:10);
+  gain=Math.floor(gain*diff().coinBonus);
+  player.coins+=gain; sfxDie();
+  if(z.tipo==='boss'){ showToast('BOSS DERROTADO! +'+gain+' 🪙',2600); activeBoss=null; beep(800,0.2,'sine',0.1); }
+  else if(Math.random()<0.4) sfxCoin();
+  sangue(z.x,z.y-(z.h||70)/2,14); updateHUD();
 }
-function matar(z) { z.morto = true; kills++; killsFase++; sangue(z.x, z.y - 30, 14); sfxDie(); updateHUD(); }
 
-function update(dt) {
-  elapsed += dt;
-  shootCd -= dt; knifeCd -= dt;
-  if (player.muzzle > 0) player.muzzle -= dt;
-  // volta pra pistola depois da facada
-  if (knifeTimer > 0) {
-    knifeTimer -= dt;
-    if (knifeTimer <= 0) { player.weapon = 'pistol'; updateHUD(); }
-  }
+// ---------- UPDATE ----------
+function update(dt){
+  elapsed+=dt; shootCd-=dt; knifeCd-=dt;
+  if(player.muzzle>0)player.muzzle-=dt;
+  if(knifeTimer>0){ knifeTimer-=dt; if(knifeTimer<=0){ player.weapon='pistol'; updateHUD(); } }
+  let mx=0;
+  if(keys['a']||keys['arrowleft'])mx-=1;
+  if(keys['d']||keys['arrowright'])mx+=1;
+  player.moving=!!mx;
+  player.x=Math.max(24,Math.min(W-24,player.x+mx*player.speed*dt));
+  if(mx!==0)walkPhase+=dt*11;
+  if((keys['w']||keys['arrowup']||keys[' '])&&player.onGround){ player.vy=-JUMP_V; player.onGround=false; }
+  player.vy+=GRAV*dt; player.y+=player.vy*dt;
+  if(player.y>=groundY()){ player.y=groundY(); player.vy=0; player.onGround=true; }
+  const s=shoulderPos();
+  player.aim=Math.atan2(mouse.y-s.y,mouse.x-s.x);
+  player.face=(mouse.x>=player.x)?1:-1;
+  if(mx!==0&&Math.abs(mouse.x-player.x)<30)player.face=mx;
+  if(mouse.down&&shootCd<=0&&state==='playing'&&player.weapon==='pistol'){ shoot(); shootCd=0.21; }
 
-  // movimento lateral + pulo
-  let mx = 0;
-  if (keys['a'] || keys['arrowleft']) mx -= 1;
-  if (keys['d'] || keys['arrowright']) mx += 1;
-  player.moving = !!mx;
-  player.x = Math.max(24, Math.min(W-24, player.x + mx*player.speed*dt));
-  if (mx !== 0) walkPhase += dt*11;
-
-  const wantJump = keys['w'] || keys['arrowup'] || keys[' '];
-  if (wantJump && player.onGround) { player.vy = -JUMP_V; player.onGround = false; }
-  player.vy += GRAV*dt;
-  player.y += player.vy*dt;
-  if (player.y >= groundY()) { player.y = groundY(); player.vy = 0; player.onGround = true; }
-  if (!player.onGround) player.moving = true;
-
-  // mira: facing pela posição do mouse
-  const s = shoulderPos();
-  player.aim = Math.atan2(mouse.y - s.y, mouse.x - s.x);
-  player.face = (mouse.x >= player.x) ? 1 : -1;
-  if (mx !== 0 && Math.abs(mouse.x - player.x) < 30) player.face = mx; // correndo sem mirar longe
-
-  if (mouse.down && shootCd <= 0 && state === 'playing' && player.weapon === 'pistol') { shoot(); shootCd = 0.21; }
-
-  const cfg = FASES[fase-1];
-  if (state === 'playing') {
-    spawnTimer -= dt;
-    if (spawned < cfg.total && spawnTimer <= 0 && zombies.length < cfg.maxAlive) { spawnZombie(); spawnTimer = cfg.interval; }
-    if (spawned >= cfg.total && zombies.length === 0) {
-      if (fase >= 5) {
-        state = 'victory';
-        endCard('VITÓRIA! 🏆', 'Leon limpou as 5 fases da fazenda com ' + kills + ' abates!', 'JOGAR DE NOVO');
-      } else {
-        state = 'phaseclear'; clearTimer = 3;
-        showToast('FASE ' + fase + ' COMPLETA! +30 vida', 2800);
-        beep(520,.15,'sine',.08); setTimeout(()=>beep(780,.2,'sine',.08),160);
-      }
+  const cfg=genPhase(fase);
+  if(state==='playing'){
+    spawnTimer-=dt;
+    if(spawned<cfg.total&&spawnTimer<=0&&zombies.length<cfg.maxAlive){ spawnZombie(); spawnTimer=cfg.interval; }
+    if(spawned>=cfg.total&&zombies.length===0){
+      if(fase>=TOTAL){ state='victory';
+        endCard('VITÓRIA! 🏆','Leon zerou as 25 fases ['+diff().nome+'] com '+kills+' abates e 🪙'+player.coins+'!','JOGAR DE NOVO'); }
+      else if(fase>=10){ openMerchant(); }
+      else { state='phaseclear'; clearTimer=3;
+        showToast('FASE '+fase+' COMPLETA! +30 vida',2600);
+        beep(520,.15,'sine',.08); setTimeout(()=>beep(780,.2,'sine',.08),160); }
       updateHUD();
     }
   }
-  if (state === 'phaseclear') { clearTimer -= dt; if (clearTimer <= 0) startPhase(fase+1); }
+  if(state==='phaseclear'){ clearTimer-=dt; if(clearTimer<=0)startPhase(fase+1); }
 
-  // balas
-  for (let i = bullets.length-1; i >= 0; i--) {
-    const b = bullets[i];
-    b.vy += 300*dt; // leve queda
-    b.x += b.vx*dt; b.y += b.vy*dt; b.life -= dt;
-    if (b.life <= 0 || b.x < -30 || b.x > W+30 || b.y > groundY()+10) { bullets.splice(i,1); continue; }
-    for (const z of zombies) {
-      if (z.morto) continue;
-      const zx = z.x, zy = z.y - z.h/2;
-      const d = Math.hypot(zx-b.x, zy-b.y);
-      const rr = (z.tipo === 'brute' ? 30 : 20) + b.r;
-      if (d < rr) {
-        z.hp -= 1; sangue(b.x, b.y, 5); bullets.splice(i,1);
-        if (z.hp <= 0) matar(z); else sfxHit();
-        break;
-      }
+  for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i];
+    b.vy+=300*dt; b.x+=b.vx*dt; b.y+=b.vy*dt; b.life-=dt;
+    if(b.life<=0||b.x<-30||b.x>W+30||b.y>groundY()+10){ bullets.splice(i,1); continue; }
+    for(const z of zombies){ if(z.morto)continue;
+      const d=Math.hypot(z.x-b.x,(z.y-(z.h||70)/2)-b.y);
+      const rr=(z.tipo==='boss'?38:(z.tipo==='brute'?28:20))+b.r;
+      if(d<rr){ z.hp-=pistolDmg(); sangue(b.x,b.y,5); bullets.splice(i,1);
+        if(z.hp<=0)matar(z); else sfxHit(); break; } }
+  }
+  zombies=zombies.filter(z=>!z.morto);
+  for(const z of zombies){
+    z.hitCd-=dt; z.wob+=dt*z.wobV;
+    const dir=Math.sign(player.x-z.x)||1;
+    let sp=z.speed;
+    // boss investida
+    if(z.tipo==='boss'){
+      z.chargeCd-=dt;
+      if(z.charging>0){ z.charging-=dt; sp=z.speed*3.1; }
+      else if(z.chargeCd<=0&&Math.abs(player.x-z.x)>220){ z.charging=0.8; z.chargeCd=4; sfxBoss();
+        for(let i=0;i<10;i++)parts.push({x:z.x,y:z.y-20,vx:(Math.random()-.5)*200,vy:-Math.random()*200,life:.4,max:.4,cor:'#ff5b5b',r:3}); }
+    }
+    z.x+=dir*sp*dt;
+    let zy=groundY();
+    if(z.tipo==='runner')zy-=Math.abs(Math.sin(z.wob*1.6))*8;
+    if(z.tipo==='boss'&&z.charging>0)zy-=4;
+    z.y+=(zy-z.y)*Math.min(1,dt*10);
+    const dx=Math.abs(player.x-z.x);
+    const reach=z.tipo==='boss'?52:34;
+    if(dx<reach&&Math.abs(player.y-z.y)<110&&z.hitCd<=0&&state==='playing'){
+      z.hitCd=z.tipo==='boss'?0.7:0.9;
+      const real=Math.max(1,Math.floor(z.dmg*(1-armorRed())));
+      player.hp-=real; sfxHurt();
+      dmgflash.style.opacity=1; setTimeout(()=>dmgflash.style.opacity=0,180);
+      sangue(player.x,player.y-50,8); updateHUD();
+      if(player.hp<=0){ player.hp=0; state='gameover'; updateHUD();
+        endCard('VOCÊ MORREU ☠','Leon caiu na fase '+fase+'/25 ['+diff().nome+'] com '+kills+' abates e 🪙'+player.coins+'.','TENTAR DE NOVO'); }
     }
   }
-  zombies = zombies.filter(z => !z.morto);
-
-  // zumbis andam até o Leon no chão
-  for (const z of zombies) {
-    z.hitCd -= dt; z.wob += dt*z.wobV;
-    const dir = Math.sign(player.x - z.x) || 1;
-    // runner pula às vezes
-    let zy = groundY();
-    if (z.tipo === 'runner') zy -= Math.abs(Math.sin(z.wob*1.6))*8;
-    z.x += dir * z.speed * dt;
-    z.y += (zy - z.y) * Math.min(1, dt*10);
-    const dx = Math.abs(player.x - z.x);
-    const dy = Math.abs(player.y - z.y);
-    if (dx < 34 && dy < 90 && z.hitCd <= 0 && state === 'playing') {
-      z.hitCd = 0.9;
-      player.hp -= z.dmg; sfxHurt();
-      dmgflash.style.opacity = 1;
-      setTimeout(()=>dmgflash.style.opacity = 0, 180);
-      sangue(player.x, player.y-50, 8);
-      updateHUD();
-      if (player.hp <= 0) {
-        player.hp = 0; state = 'gameover'; updateHUD();
-        endCard('VOCÊ MORREU ☠', 'Leon caiu na fase ' + fase + ' com ' + kills + ' abates.', 'TENTAR DE NOVO');
-      }
-    }
-  }
-
-  for (let i = parts.length-1; i >= 0; i--) {
-    const p = parts[i];
-    p.vy += 600*dt;
-    p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= .98; p.life -= dt;
-    if (p.life <= 0 || p.y > groundY()+6) parts.splice(i,1);
-  }
-  for (const e of embers) {
-    e.y -= e.v*dt; e.x += Math.sin(elapsed + e.o)*20*dt;
-    if (e.y < -10) { e.y = H+10; e.x = Math.random()*W; }
-  }
+  for(let i=parts.length-1;i>=0;i--){ const p=parts[i];
+    p.vy+=600*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.vx*=.98; p.life-=dt;
+    if(p.life<=0||p.y>groundY()+6)parts.splice(i,1); }
+  for(const e of embers){ e.y-=e.v*dt; e.x+=Math.sin(elapsed+e.o)*20*dt;
+    if(e.y<-10){ e.y=H+10; e.x=Math.random()*W; } }
   updateHUD();
 }
 
-// ---------- FUNDO SIDE-VIEW ----------
-function drawBackground(t) {
-  const gy = groundY();
-  const ceu = ctx.createLinearGradient(0,0,0,gy);
+// ---------- FUNDO ----------
+function drawBackground(t){
+  const gy=groundY();
+  const ceu=ctx.createLinearGradient(0,0,0,gy);
+  // fase mais alta = céu mais vermelho
+  const f=fase/TOTAL;
   ceu.addColorStop(0,'#0b0705'); ceu.addColorStop(0.5,'#3a1c0d');
-  ceu.addColorStop(0.8,'#7a3a12'); ceu.addColorStop(1,'#a8541c');
-  ctx.fillStyle = ceu; ctx.fillRect(0,0,W,gy+2);
-
-  const sx = W*0.72, sy = H*0.22;
-  const glow = ctx.createRadialGradient(sx,sy,10,sx,sy,130);
+  ceu.addColorStop(0.8,f>0.6?'#8a2412':'#7a3a12'); ceu.addColorStop(1,f>0.6?'#c03a1c':'#a8541c');
+  ctx.fillStyle=ceu; ctx.fillRect(0,0,W,gy+2);
+  const sx=W*0.72,sy=H*0.22;
+  const glow=ctx.createRadialGradient(sx,sy,10,sx,sy,130);
   glow.addColorStop(0,'rgba(255,200,120,.9)'); glow.addColorStop(1,'rgba(255,120,40,0)');
-  ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(sx,sy,130,0,7); ctx.fill();
-  ctx.fillStyle = '#f7d9a8'; ctx.beginPath(); ctx.arc(sx,sy,32,0,7); ctx.fill();
-
-  ctx.fillStyle = 'rgba(20,12,8,.55)';
-  for (let i = 0; i < 6; i++) {
-    const cx = ((i*W/5) + t*12*(1+i*0.2)) % (W+300) - 150;
-    ctx.beginPath(); ctx.ellipse(cx, H*0.12+(i%3)*30, 120, 20, 0, 0, 7); ctx.fill();
-  }
-  // colinas ao fundo
-  ctx.fillStyle = '#241209';
-  ctx.beginPath(); ctx.moveTo(0,gy);
-  for (let x = 0; x <= W; x += 40) ctx.lineTo(x, gy-40-Math.sin(x*0.01)*18);
+  ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(sx,sy,130,0,7); ctx.fill();
+  ctx.fillStyle='#f7d9a8'; ctx.beginPath(); ctx.arc(sx,sy,32,0,7); ctx.fill();
+  ctx.fillStyle='rgba(20,12,8,.55)';
+  for(let i=0;i<6;i++){ const cx=((i*W/5)+t*12*(1+i*0.2))%(W+300)-150;
+    ctx.beginPath(); ctx.ellipse(cx,H*0.12+(i%3)*30,120,20,0,0,7); ctx.fill(); }
+  ctx.fillStyle='#241209'; ctx.beginPath(); ctx.moveTo(0,gy);
+  for(let x=0;x<=W;x+=40)ctx.lineTo(x,gy-40-Math.sin(x*0.01)*18);
   ctx.lineTo(W,gy); ctx.closePath(); ctx.fill();
-
-  // celeiro lateral (esquerda)
-  const bx = W*0.05, bw = Math.min(230,W*0.22), bh = 150, by = gy-bh;
-  ctx.fillStyle = '#4a2a16'; ctx.fillRect(bx,by,bw,bh);
-  ctx.fillStyle = '#2c170b';
-  ctx.beginPath(); ctx.moveTo(bx-12,by); ctx.lineTo(bx+bw/2,by-60); ctx.lineTo(bx+bw+12,by); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#120a05'; ctx.fillRect(bx+bw*0.35,by+50,bw*0.3,bh-50);
-  ctx.strokeStyle = 'rgba(0,0,0,.5)';
-  for (let i = 1; i < 5; i++) { ctx.beginPath(); ctx.moveTo(bx,by+i*bh/5); ctx.lineTo(bx+bw,by+i*bh/5); ctx.stroke(); }
-  const fl = 0.6+Math.sin(t*9)*0.3;
-  ctx.fillStyle = 'rgba(255,'+Math.floor(90+60*fl)+',20,.85)';
+  const bx=W*0.05,bw=Math.min(230,W*0.22),bh=150,by=gy-bh;
+  ctx.fillStyle='#4a2a16'; ctx.fillRect(bx,by,bw,bh);
+  ctx.fillStyle='#2c170b'; ctx.beginPath(); ctx.moveTo(bx-12,by); ctx.lineTo(bx+bw/2,by-60); ctx.lineTo(bx+bw+12,by); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#120a05'; ctx.fillRect(bx+bw*0.35,by+50,bw*0.3,bh-50);
+  ctx.strokeStyle='rgba(0,0,0,.5)';
+  for(let i=1;i<5;i++){ ctx.beginPath(); ctx.moveTo(bx,by+i*bh/5); ctx.lineTo(bx+bw,by+i*bh/5); ctx.stroke(); }
+  const fl=0.6+Math.sin(t*9)*0.3;
+  ctx.fillStyle='rgba(255,'+Math.floor(90+60*fl)+',20,.85)';
   ctx.beginPath(); ctx.ellipse(bx+bw/2,by+bh-12,18*fl+8,10,0,0,7); ctx.fill();
-
-  // silo direita
-  const gx = W*0.88, gw = 64, gh = 190, gy2 = gy-gh;
-  ctx.fillStyle = '#5c6066'; ctx.fillRect(gx-gw/2,gy2,gw,gh);
-  ctx.fillStyle = '#3c3f44'; ctx.fillRect(gx-gw/2,gy2,gw,22);
-  ctx.fillStyle = '#0d0906'; ctx.beginPath(); ctx.ellipse(gx,gy2+90,14,20,0.2,0,7); ctx.fill();
-
-  // moinho
-  const mx = W*0.34;
-  ctx.strokeStyle = '#1d130c'; ctx.lineWidth = 6;
+  const gx=W*0.88,gw=64,gh=190,gy2=gy-gh;
+  ctx.fillStyle='#5c6066'; ctx.fillRect(gx-gw/2,gy2,gw,gh);
+  ctx.fillStyle='#3c3f44'; ctx.fillRect(gx-gw/2,gy2,gw,22);
+  ctx.fillStyle='#0d0906'; ctx.beginPath(); ctx.ellipse(gx,gy2+90,14,20,0.2,0,7); ctx.fill();
+  const mx=W*0.34;
+  ctx.strokeStyle='#1d130c'; ctx.lineWidth=6;
   ctx.beginPath(); ctx.moveTo(mx,gy-20); ctx.lineTo(mx+8,gy-130); ctx.stroke();
-
-  // árvores mortas
-  function arvore(x,s){
-    ctx.strokeStyle = '#140d08'; ctx.lineCap='round'; ctx.lineWidth = 5*s;
-    ctx.beginPath(); ctx.moveTo(x,gy); ctx.lineTo(x+4*s,gy-60*s); ctx.stroke();
-    ctx.lineWidth = 3*s;
+  function arvore(x,s){ ctx.strokeStyle='#140d08'; ctx.lineCap='round'; ctx.lineWidth=5*s;
+    ctx.beginPath(); ctx.moveTo(x,gy); ctx.lineTo(x+4*s,gy-60*s); ctx.stroke(); ctx.lineWidth=3*s;
     ctx.beginPath(); ctx.moveTo(x+4*s,gy-60*s); ctx.lineTo(x-24*s,gy-92*s); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x+4*s,gy-60*s); ctx.lineTo(x+30*s,gy-84*s); ctx.stroke();
-  }
+    ctx.beginPath(); ctx.moveTo(x+4*s,gy-60*s); ctx.lineTo(x+30*s,gy-84*s); ctx.stroke(); }
   arvore(W*0.5,1); arvore(W*0.62,0.7);
-
-  // chão
-  const chao = ctx.createLinearGradient(0,gy,0,H);
+  const chao=ctx.createLinearGradient(0,gy,0,H);
   chao.addColorStop(0,'#3a2412'); chao.addColorStop(1,'#120b06');
-  ctx.fillStyle = chao; ctx.fillRect(0,gy,W,H-gy);
-  ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(0,gy,W,4);
-  // cerca
-  ctx.fillStyle = '#2e1c0e';
-  for (let x = 20; x < W; x += 110) ctx.fillRect(x,gy-46,8,46);
-  ctx.strokeStyle = 'rgba(60,40,20,.9)'; ctx.lineWidth = 2;
+  ctx.fillStyle=chao; ctx.fillRect(0,gy,W,H-gy);
+  ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(0,gy,W,4);
+  ctx.fillStyle='#2e1c0e';
+  for(let x=20;x<W;x+=110)ctx.fillRect(x,gy-46,8,46);
+  ctx.strokeStyle='rgba(60,40,20,.9)'; ctx.lineWidth=2;
   ctx.beginPath(); ctx.moveTo(0,gy-38); ctx.lineTo(W,gy-38); ctx.stroke();
-  // capim
-  ctx.strokeStyle = '#6b5a2e';
-  for (let i = 0; i < 50; i++) {
-    const px = (i*173.3)%W, py = gy+8+(i*97)%(H-gy-16);
-    ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px-4,py-10); ctx.moveTo(px,py); ctx.lineTo(px+3,py-12); ctx.stroke();
-  }
-  // trator lateral
-  const tx = W*0.58;
-  ctx.fillStyle = '#3f4a1e'; ctx.fillRect(tx,gy-54,120,34);
-  ctx.fillStyle = '#222';
+  ctx.strokeStyle='#6b5a2e';
+  for(let i=0;i<50;i++){ const px=(i*173.3)%W,py=gy+8+(i*97)%(H-gy-16);
+    ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px-4,py-10); ctx.moveTo(px,py); ctx.lineTo(px+3,py-12); ctx.stroke(); }
+  const tx=W*0.58;
+  ctx.fillStyle='#3f4a1e'; ctx.fillRect(tx,gy-54,120,34);
+  ctx.fillStyle='#222';
   ctx.beginPath(); ctx.arc(tx+26,gy-8,22,0,7); ctx.fill();
   ctx.beginPath(); ctx.arc(tx+104,gy-8,14,0,7); ctx.fill();
-
-  for (const e of embers) {
-    ctx.fillStyle = 'rgba(255,'+Math.floor(120+Math.random()*80)+',40,.8)';
-    ctx.beginPath(); ctx.arc(e.x,e.y,e.s,0,7); ctx.fill();
-  }
-  const vg = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.75);
+  for(const e of embers){ ctx.fillStyle='rgba(255,'+Math.floor(120+Math.random()*80)+',40,.8)';
+    ctx.beginPath(); ctx.arc(e.x,e.y,e.s,0,7); ctx.fill(); }
+  const vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.75);
   vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.55)');
-  ctx.fillStyle = vg; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  // marca d'água boss
+  if(genPhase(fase||1).isBoss&&state==='playing'){
+    ctx.fillStyle='rgba(255,40,40,.75)'; ctx.font='bold 15px Arial'; ctx.textAlign='center';
+    ctx.fillText('☠ FASE DE BOSS ☠',W/2,96);
+  }
 }
 
-// ---------- LEON REALISTA LATERAL, UMA ARMA POR VEZ ----------
-function drawPlayer(t) {
-  const p = player;
-  ctx.save(); ctx.translate(p.x, p.y);
-  ctx.fillStyle = 'rgba(0,0,0,.45)';
-  ctx.beginPath(); ctx.ellipse(0,4,20,7,0,0,7); ctx.fill();
-  ctx.scale(p.face,1); // espelha p/ lado da mira
-
-  const swing = (p.moving && p.onGround) ? Math.sin(walkPhase)*10 : 0;
-  const air = !p.onGround ? 6 : 0;
-
-  ctx.lineCap = 'round';
-  // perna de trás (escura)
-  ctx.strokeStyle = '#232b3a'; ctx.lineWidth = 10;
-  ctx.beginPath(); ctx.moveTo(-2,-42); ctx.lineTo(-6 - swing, -4 - air); ctx.stroke();
-  ctx.fillStyle = '#1a120b'; ctx.fillRect(-13 - swing, -10 - air, 15, 8); // bota trás
-  // perna da frente (jeans)
-  ctx.strokeStyle = '#2e3d55'; ctx.lineWidth = 10;
-  ctx.beginPath(); ctx.moveTo(2,-42); ctx.lineTo(6 + swing, -4); ctx.stroke();
-  ctx.fillStyle = '#2b1c10'; ctx.fillRect(-1 + swing, -10, 16, 8); // bota frente
-
-  // torso: jaqueta marrom Leon RE4
-  ctx.fillStyle = '#5d3f27';
-  ctx.beginPath();
-  ctx.moveTo(-11,-72); ctx.lineTo(11,-72); ctx.lineTo(13,-44); ctx.lineTo(-11,-42); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#6f4f32';
-  ctx.beginPath();
-  ctx.moveTo(-11,-72); ctx.lineTo(-2,-72); ctx.lineTo(-4,-44); ctx.lineTo(-11,-42); ctx.closePath(); ctx.fill();
-  // zíper + cinto
-  ctx.strokeStyle = '#2b1c10'; ctx.lineWidth = 2;
+// ---------- LEON ----------
+function drawPlayer(t){
+  const p=player;
+  ctx.save(); ctx.translate(p.x,p.y);
+  ctx.fillStyle='rgba(0,0,0,.45)'; ctx.beginPath(); ctx.ellipse(0,4,20,7,0,0,7); ctx.fill();
+  ctx.scale(p.face,1);
+  const swing=(p.moving&&p.onGround)?Math.sin(walkPhase)*10:0;
+  const air=!p.onGround?6:0;
+  ctx.lineCap='round';
+  ctx.strokeStyle='#232b3a'; ctx.lineWidth=10;
+  ctx.beginPath(); ctx.moveTo(-2,-42); ctx.lineTo(-6-swing,-4-air); ctx.stroke();
+  ctx.fillStyle='#1a120b'; ctx.fillRect(-13-swing,-10-air,15,8);
+  ctx.strokeStyle='#2e3d55'; ctx.lineWidth=10;
+  ctx.beginPath(); ctx.moveTo(2,-42); ctx.lineTo(6+swing,-4); ctx.stroke();
+  ctx.fillStyle='#2b1c10'; ctx.fillRect(-1+swing,-10,16,8);
+  ctx.fillStyle='#5d3f27';
+  ctx.beginPath(); ctx.moveTo(-11,-72); ctx.lineTo(11,-72); ctx.lineTo(13,-44); ctx.lineTo(-11,-42); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#6f4f32';
+  ctx.beginPath(); ctx.moveTo(-11,-72); ctx.lineTo(-2,-72); ctx.lineTo(-4,-44); ctx.lineTo(-11,-42); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle='#2b1c10'; ctx.lineWidth=2;
   ctx.beginPath(); ctx.moveTo(1,-70); ctx.lineTo(1,-44); ctx.stroke();
-  ctx.fillStyle = '#141414'; ctx.fillRect(-12,-46,25,6);
-  ctx.fillStyle = '#c9a227'; ctx.fillRect(-2,-46,5,6);
-  // gola
-  ctx.fillStyle = '#3f2a18';
+  ctx.fillStyle='#141414'; ctx.fillRect(-12,-46,25,6);
+  ctx.fillStyle='#c9a227'; ctx.fillRect(-2,-46,5,6);
+  ctx.fillStyle='#3f2a18';
   ctx.beginPath(); ctx.moveTo(-10,-72); ctx.lineTo(-4,-78); ctx.lineTo(-2,-71); ctx.closePath(); ctx.fill();
   ctx.beginPath(); ctx.moveTo(10,-72); ctx.lineTo(5,-78); ctx.lineTo(3,-71); ctx.closePath(); ctx.fill();
-  // patch RPD no ombro (visível de lado)
-  ctx.fillStyle = '#1c3a5e'; ctx.beginPath(); ctx.arc(-4,-62,5,0,7); ctx.fill();
-  ctx.fillStyle = '#cfe4ff'; ctx.font = 'bold 5px Arial'; ctx.textAlign='center';
-  ctx.fillText('RPD',-4,-60);
-
-  // cabeça realista lateral
-  // pescoço
-  ctx.fillStyle = '#d9a377'; ctx.fillRect(-3,-82,8,8);
-  // rosto
-  ctx.fillStyle = '#e8b88a';
-  ctx.beginPath(); ctx.ellipse(3,-88,8,9,0,0,7); ctx.fill();
-  // nariz + olho + sobrancelha
-  ctx.fillStyle = '#c9986f'; ctx.fillRect(10,-88,3,4);
-  ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(5,-89,1.6,0,7); ctx.fill();
-  ctx.strokeStyle = '#2b1c10'; ctx.lineWidth = 1.5;
+  ctx.fillStyle='#1c3a5e'; ctx.beginPath(); ctx.arc(-4,-62,5,0,7); ctx.fill();
+  ctx.fillStyle='#cfe4ff'; ctx.font='bold 5px Arial'; ctx.textAlign='center'; ctx.fillText('RPD',-4,-60);
+  ctx.fillStyle='#d9a377'; ctx.fillRect(-3,-82,8,8);
+  ctx.fillStyle='#e8b88a'; ctx.beginPath(); ctx.ellipse(3,-88,8,9,0,0,7); ctx.fill();
+  ctx.fillStyle='#c9986f'; ctx.fillRect(10,-88,3,4);
+  ctx.fillStyle='#1a1a1a'; ctx.beginPath(); ctx.arc(5,-89,1.6,0,7); ctx.fill();
+  ctx.strokeStyle='#2b1c10'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(2,-93); ctx.lineTo(8,-92); ctx.stroke();
-  // cabelo Leon: volume em cima + franja lateral
-  ctx.fillStyle = '#3a2a1c';
-  ctx.beginPath(); ctx.ellipse(0,-95,10,6,-0.2,0,7); ctx.fill();
+  ctx.fillStyle='#3a2a1c'; ctx.beginPath(); ctx.ellipse(0,-95,10,6,-0.2,0,7); ctx.fill();
   ctx.beginPath(); ctx.moveTo(-9,-94); ctx.lineTo(-12,-84); ctx.lineTo(-6,-88); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(6,-99); ctx.lineTo(10,-90); ctx.lineTo(4,-92); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#4d3a26';
-  ctx.beginPath(); ctx.ellipse(-1,-97,7,3,-0.3,0,7); ctx.fill();
-
-  // ângulo local da mira (já espelhado)
-  const s = { x: 0, y: -62 };
-  let local = Math.atan2(mouse.y-(p.y-62),(mouse.x-p.x)*p.face);
-  if (local > 1.35) local = 1.35;
-  if (local < -1.35) local = -1.35;
-
-  if (p.weapon === 'pistol') {
-    // SÓ PISTOLA: braço estendido mirando, faca guardada (não aparece)
+  ctx.fillStyle='#4d3a26'; ctx.beginPath(); ctx.ellipse(-1,-97,7,3,-0.3,0,7); ctx.fill();
+  const s={x:0,y:-62};
+  let local=Math.atan2(mouse.y-(p.y-62),(mouse.x-p.x)*p.face);
+  if(local>1.35)local=1.35; if(local<-1.35)local=-1.35;
+  if(p.weapon==='pistol'){
     ctx.save(); ctx.translate(s.x,s.y); ctx.rotate(local);
-    // manga da jaqueta
-    ctx.fillStyle = '#5d3f27'; ctx.fillRect(-4,-5,18,10);
-    // mão
-    ctx.fillStyle = '#e8b88a'; ctx.beginPath(); ctx.arc(15,0,4.5,0,7); ctx.fill();
-    // pistola realista lateral
-    ctx.fillStyle = '#171717'; ctx.fillRect(14,-3.5,22,6);
-    ctx.fillStyle = '#8f959d'; ctx.fillRect(14,-3.5,22,2); // brilho do ferrolho
-    ctx.fillStyle = '#0c0c0c'; ctx.fillRect(17,2,5,8); // empunhadura
-    ctx.fillStyle = '#333'; ctx.fillRect(33,-1.5,4,3); // cano
-    if (p.muzzle > 0) {
-      ctx.fillStyle = 'rgba(255,220,120,.95)';
+    ctx.fillStyle='#5d3f27'; ctx.fillRect(-4,-5,18,10);
+    ctx.fillStyle='#e8b88a'; ctx.beginPath(); ctx.arc(15,0,4.5,0,7); ctx.fill();
+    ctx.fillStyle='#171717'; ctx.fillRect(14,-3.5,22,6);
+    ctx.fillStyle='#8f959d'; ctx.fillRect(14,-3.5,22,2);
+    ctx.fillStyle='#0c0c0c'; ctx.fillRect(17,2,5,8);
+    ctx.fillStyle='#333'; ctx.fillRect(33,-1.5,4,3);
+    if(p.muzzle>0){ ctx.fillStyle='rgba(255,220,120,.95)';
       ctx.beginPath(); ctx.moveTo(37,0); ctx.lineTo(52,-8); ctx.lineTo(52,8); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(40,0,4,0,7); ctx.fill();
-    }
+      ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(40,0,4,0,7); ctx.fill(); }
     ctx.restore();
-    // braço de apoio junto ao peito (sem arma)
-    ctx.fillStyle = '#4d3421'; ctx.fillRect(-8,-60,12,7);
+    ctx.fillStyle='#4d3421'; ctx.fillRect(-8,-60,12,7);
   } else {
-    // SÓ FACA: pistola guardada no coldre (só o cabo aparece), mão com faca
-    // cabo da pistola no coldre da cintura
-    ctx.fillStyle = '#0c0c0c'; ctx.fillRect(6,-50,6,8);
-    const slash = 1 - knifeTimer/0.30; // 0→1
-    ctx.save(); ctx.translate(s.x,s.y); ctx.rotate(-0.15 + Math.sin(slash*Math.PI)*0.55);
-    ctx.fillStyle = '#5d3f27'; ctx.fillRect(-4,-5,18,10);
-    ctx.fillStyle = '#e8b88a'; ctx.beginPath(); ctx.arc(15,0,4.5,0,7); ctx.fill();
-    // faca de combate
-    ctx.fillStyle = '#4a2c14'; ctx.fillRect(14,-2.5,9,5); // cabo
-    ctx.fillStyle = '#dfe5ec';
+    ctx.fillStyle='#0c0c0c'; ctx.fillRect(6,-50,6,8);
+    const slash=1-knifeTimer/0.30;
+    ctx.save(); ctx.translate(s.x,s.y); ctx.rotate(-0.15+Math.sin(slash*Math.PI)*0.55);
+    ctx.fillStyle='#5d3f27'; ctx.fillRect(-4,-5,18,10);
+    ctx.fillStyle='#e8b88a'; ctx.beginPath(); ctx.arc(15,0,4.5,0,7); ctx.fill();
+    ctx.fillStyle='#4a2c14'; ctx.fillRect(14,-2.5,9,5);
+    ctx.fillStyle='#dfe5ec';
     ctx.beginPath(); ctx.moveTo(23,-3); ctx.lineTo(46,-1.5); ctx.lineTo(46,1.5); ctx.lineTo(23,3); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.fillRect(24,-1,18,1); // fio
+    ctx.fillStyle='#fff'; ctx.fillRect(24,-1,18,1);
     ctx.restore();
-    // arco do corte
     ctx.save(); ctx.translate(s.x,s.y);
-    ctx.strokeStyle = 'rgba(255,255,255,'+(0.9*(1-slash))+')'; ctx.lineWidth = 5;
+    ctx.strokeStyle='rgba(255,255,255,'+(0.9*(1-slash))+')'; ctx.lineWidth=5;
     ctx.beginPath(); ctx.arc(10,0,46,-0.9+slash*0.9,0.5+slash*0.9); ctx.stroke();
-    ctx.fillStyle = 'rgba(255,220,150,'+(0.9*(1-slash))+')';
-    ctx.font = 'bold 13px Arial'; ctx.textAlign='center';
-    ctx.fillText('FACA!', 30, -34);
+    ctx.fillStyle='rgba(255,220,150,'+(0.9*(1-slash))+')';
+    ctx.font='bold 13px Arial'; ctx.textAlign='center'; ctx.fillText('FACA!',30,-34);
     ctx.restore();
   }
   ctx.restore();
-
-  // barra de vida + nome (sem espelhar)
-  ctx.fillStyle = 'rgba(0,0,0,.65)'; ctx.fillRect(p.x-30,p.y-112,60,8);
-  ctx.fillStyle = p.hp > 40 ? '#5dd35d' : '#ff4b4b';
-  ctx.fillRect(p.x-29,p.y-111,58*Math.max(0,p.hp)/100,6);
-  ctx.fillStyle = '#cfe4ff'; ctx.font = 'bold 10px Arial'; ctx.textAlign='center';
-  ctx.fillText('LEON', p.x, p.y-116);
+  ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillRect(p.x-30,p.y-112,60,8);
+  ctx.fillStyle=p.hp/p.maxHp>0.4?'#5dd35d':'#ff4b4b';
+  ctx.fillRect(p.x-29,p.y-111,58*Math.max(0,p.hp/p.maxHp),6);
+  ctx.fillStyle='#cfe4ff'; ctx.font='bold 10px Arial'; ctx.textAlign='center';
+  ctx.fillText('LEON',p.x,p.y-116);
 }
-
-// ---------- ZUMBIS LATERAIS ----------
-function drawZombies(t) {
-  for (const z of zombies) {
-    const st = ZSTATS[z.tipo];
-    const face = (player.x >= z.x) ? 1 : -1;
-    const h = z.h, wob = Math.sin(z.wob)*4;
-    ctx.save(); ctx.translate(z.x, z.y);
-    ctx.fillStyle = 'rgba(0,0,0,.4)';
-    ctx.beginPath(); ctx.ellipse(0,3,h*0.25,6,0,0,7); ctx.fill();
+function drawZombies(t){
+  for(const z of zombies){
+    const face=(player.x>=z.x)?1:-1;
+    const h=z.h||72, wob=Math.sin(z.wob)*4;
+    const isBoss=z.tipo==='boss';
+    ctx.save(); ctx.translate(z.x,z.y);
+    ctx.fillStyle='rgba(0,0,0,.4)';
+    ctx.beginPath(); ctx.ellipse(0,3,h*0.28,6,0,0,7); ctx.fill();
     ctx.scale(face,1);
-    const lp = Math.sin(z.wob)*8;
-    ctx.lineCap = 'round';
-    // pernas
-    ctx.strokeStyle = st.esc; ctx.lineWidth = z.tipo==='brute'?12:9;
+    if(isBoss&&z.charging>0){
+      ctx.strokeStyle='rgba(255,60,60,.8)'; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.arc(0,-h/2,44+Math.random()*8,0,7); ctx.stroke();
+    }
+    const lp=Math.sin(z.wob)*(isBoss?10:8);
+    ctx.lineCap='round';
+    ctx.strokeStyle=z.esc; ctx.lineWidth=isBoss?14:(z.tipo==='brute'?12:9);
     ctx.beginPath(); ctx.moveTo(0,-h*0.5); ctx.lineTo(-4-lp,-2); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0,-h*0.5); ctx.lineTo(4+lp,-2); ctx.stroke();
-    // torso rasgado
-    ctx.fillStyle = st.camisa;
-    ctx.fillRect(-10,-h*0.85,20,h*0.38);
-    ctx.fillStyle = st.cor;
-    ctx.fillRect(-9,-h*0.85,18,8);
-    // braços estendidos p/ frente (perseguindo)
-    ctx.strokeStyle = st.cor; ctx.lineWidth = 7;
-    const reach = 14 + Math.sin(z.wob*1.4)*4;
+    ctx.fillStyle=z.camisa; ctx.fillRect(-11,-h*0.85,22,h*0.38);
+    ctx.fillStyle=z.cor; ctx.fillRect(-10,-h*0.85,20,8);
+    ctx.strokeStyle=z.cor; ctx.lineWidth=isBoss?10:7;
+    const reach=14+Math.sin(z.wob*1.4)*4;
     ctx.beginPath(); ctx.moveTo(2,-h*0.75); ctx.lineTo(20+reach,-h*0.68+wob); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(2,-h*0.68); ctx.lineTo(20+reach*0.8,-h*0.58+wob); ctx.stroke();
-    ctx.fillStyle = st.cor;
-    ctx.beginPath(); ctx.arc(22+reach,-h*0.68+wob,4,0,7); ctx.fill();
-    // cabeça lateral
-    ctx.fillStyle = st.cor;
-    ctx.beginPath(); ctx.ellipse(4,-h+8,9,10,0,0,7); ctx.fill();
-    // boca aberta + olhos vermelhos
-    ctx.fillStyle = '#2a0d0d'; ctx.beginPath(); ctx.ellipse(11,-h+12,3,5,0,0,7); ctx.fill();
-    ctx.fillStyle = '#ff2222'; ctx.beginPath(); ctx.arc(5,-h+6,2.2,0,7); ctx.fill();
-    // cabelo ralo / feridas
-    ctx.fillStyle = 'rgba(60,10,10,.7)';
-    ctx.fillRect(-3,-h-1,6,3);
-    if (z.tipo === 'brute') {
-      ctx.fillStyle = '#3a2c22';
-      ctx.beginPath(); ctx.arc(-8,-h*0.6,5,0,7); ctx.fill();
-      ctx.beginPath(); ctx.arc(-8,-h*0.45,5,0,7); ctx.fill();
+    ctx.fillStyle=z.cor; ctx.beginPath(); ctx.arc(22+reach,-h*0.68+wob,isBoss?6:4,0,7); ctx.fill();
+    ctx.fillStyle=z.cor; ctx.beginPath(); ctx.ellipse(4,-h+8,isBoss?13:9,isBoss?14:10,0,0,7); ctx.fill();
+    ctx.fillStyle='#2a0d0d'; ctx.beginPath(); ctx.ellipse(12,-h+12,3.5,5.5,0,0,7); ctx.fill();
+    ctx.fillStyle=isBoss?'#ffff00':'#ff2222'; ctx.beginPath(); ctx.arc(5,-h+6,isBoss?3.4:2.2,0,7); ctx.fill();
+    if(isBoss){ // coroa/chifres do boss
+      ctx.fillStyle='#1a0d0d';
+      ctx.beginPath(); ctx.moveTo(-6,-h-2); ctx.lineTo(-2,-h-12); ctx.lineTo(2,-h-2); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(4,-h-2); ctx.lineTo(8,-h-12); ctx.lineTo(12,-h-2); ctx.closePath(); ctx.fill();
     }
     ctx.restore();
-    if (z.hp < z.maxHp) {
-      ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(z.x-20,z.y-h-14,40,5);
-      ctx.fillStyle = '#ff5b5b'; ctx.fillRect(z.x-19,z.y-h-13,38*(z.hp/z.maxHp),3);
+    if(z.hp<z.maxHp&&z.tipo!=='boss'){
+      ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(z.x-20,z.y-h-14,40,5);
+      ctx.fillStyle='#ff5b5b'; ctx.fillRect(z.x-19,z.y-h-13,38*(z.hp/z.maxHp),3);
     }
   }
 }
-
-function draw() {
-  const t = elapsed;
+function draw(){
+  const t=elapsed;
   drawBackground(t);
-  for (const b of bullets) {
-    ctx.fillStyle = '#ffe27a';
-    ctx.beginPath(); ctx.arc(b.x,b.y,b.r+2,0,7); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,7); ctx.fill();
-  }
-  for (const p of parts) {
-    ctx.globalAlpha = Math.max(0,p.life/p.max);
-    ctx.fillStyle = p.cor;
-    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill();
-  }
-  ctx.globalAlpha = 1;
-  if (player && state !== 'menu') drawZombies(t);
-  if (player && state !== 'menu') drawPlayer(t);
-  if (state === 'playing' || state === 'phaseclear') {
-    ctx.strokeStyle = '#ffcf6e'; ctx.lineWidth = 2;
+  for(const b of bullets){ ctx.fillStyle='#ffe27a'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r+2,0,7); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,7); ctx.fill(); }
+  for(const p of parts){ ctx.globalAlpha=Math.max(0,p.life/p.max); ctx.fillStyle=p.cor;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); }
+  ctx.globalAlpha=1;
+  if(player&&state!=='menu'){ drawZombies(t); drawPlayer(t); }
+  if(state==='playing'||state==='phaseclear'){
+    ctx.strokeStyle='#ffcf6e'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(mouse.x,mouse.y,12,0,7); ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(mouse.x-18,mouse.y); ctx.lineTo(mouse.x-7,mouse.y);
     ctx.moveTo(mouse.x+7,mouse.y); ctx.lineTo(mouse.x+18,mouse.y);
     ctx.moveTo(mouse.x,mouse.y-18); ctx.lineTo(mouse.x,mouse.y-7);
-    ctx.moveTo(mouse.x,mouse.y+7); ctx.lineTo(mouse.x,mouse.y+18);
-    ctx.stroke();
-    // linha de mira sutil da pistola
-    if (player && player.weapon === 'pistol') {
-      const s = shoulderPos();
-      ctx.strokeStyle = 'rgba(255,210,110,.25)'; ctx.lineWidth = 1;
-      ctx.setLineDash([6,6]);
-      ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(mouse.x,mouse.y); ctx.stroke();
-      ctx.setLineDash([]);
-    }
+    ctx.moveTo(mouse.x,mouse.y+7); ctx.lineTo(mouse.x,mouse.y+18); ctx.stroke();
+    if(player&&player.weapon==='pistol'){ const s=shoulderPos();
+      ctx.strokeStyle='rgba(255,210,110,.25)'; ctx.lineWidth=1; ctx.setLineDash([6,6]);
+      ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(mouse.x,mouse.y); ctx.stroke(); ctx.setLineDash([]); }
   }
 }
+let last=performance.now();
+function loop(now){ const dt=Math.min(0.05,(now-last)/1000); last=now;
+  if(state==='playing'||state==='phaseclear')update(dt); else elapsed+=dt;
+  draw(); requestAnimationFrame(loop); }
 
-let last = performance.now();
-function loop(now) {
-  const dt = Math.min(0.05,(now-last)/1000); last = now;
-  if (state === 'playing' || state === 'phaseclear') update(dt);
-  else elapsed += dt;
-  draw();
-  requestAnimationFrame(loop);
-}
-resetPlayer(); bullets = []; zombies = []; parts = []; embers = [];
-for (let i = 0; i < 70; i++) embers.push({ x: Math.random()*W, y: Math.random()*H,
-  s: 1+Math.random()*2.5, v: 12+Math.random()*30, o: Math.random()*7 });
-requestAnimationFrame(loop);
+window.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase(); keys[k]=true;
+  if(k==='f')knife();
+  if(k==='m')toggleMusic();
+  if(k==='r'&&(state==='gameover'||state==='victory'))startGame();
+  if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
+});
+window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+canvas.addEventListener('mousemove',e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
+canvas.addEventListener('mousedown',e=>{ if(e.button===0)mouse.down=true; if(e.button===2)knife(); });
+window.addEventListener('mouseup',e=>{ if(e.button===0)mouse.down=false; });
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+canvas.addEventListener('touchmove',e=>{ const t=e.touches[0]; mouse.x=t.clientX; mouse.y=t.clientY; },{passive:true});
+canvas.addEventListener('touchstart',e=>{ const t=e.touches[0]; mouse.x=t.clientX; mouse.y=t.clientY; mouse.down=true; },{passive:true});
+canvas.addEventListener('touchend',()=>mouse.down=false);
 
-window.addEventListener('keydown', e => {
-  const k = e.key.toLowerCase();
-  keys[k] = true;
-  if (k === 'f') knife();
-  if (k === 'm') toggleMusic();
-  if (k === 'r' && (state === 'gameover' || state === 'victory')) startGame();
-  if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
-});
-window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
-canvas.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-canvas.addEventListener('mousedown', e => {
-  if (e.button === 0) mouse.down = true;
-  if (e.button === 2) knife();
-});
-window.addEventListener('mouseup', e => { if (e.button === 0) mouse.down = false; });
-canvas.addEventListener('contextmenu', e => e.preventDefault());
-btnStart.onclick = () => { audio(); if (musicOn) startMusic(); startGame(); };
-canvas.addEventListener('touchmove', e => {
-  const t = e.touches[0]; mouse.x = t.clientX; mouse.y = t.clientY;
-}, { passive: true });
-canvas.addEventListener('touchstart', e => {
-  const t = e.touches[0]; mouse.x = t.clientX; mouse.y = t.clientY; mouse.down = true;
-}, { passive: true });
-canvas.addEventListener('touchend', () => mouse.down = false);
-updateHUD();
+// init
+resetPlayer(); bullets=[]; zombies=[]; parts=[]; embers=[];
+for(let i=0;i<70;i++)embers.push({x:Math.random()*W,y:Math.random()*H,s:1+Math.random()*2.5,v:12+Math.random()*30,o:Math.random()*7});
+showMenu(); updateHUD(); requestAnimationFrame(loop);
 })();
 </script>
 </body>
