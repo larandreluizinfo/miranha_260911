@@ -261,7 +261,8 @@ function showMenu(){
     '<p>Escolha a dificuldade:</p><div class="diffRow">'+btns+'</div>'+
     '<p style="font-size:12px" id="diffDesc"></p>'+
     '<div class="keys"><div><b>A/D</b> correr • <b>W/Espaço</b> pular</div>'+
-    '<div><b>Mouse+clique</b> pistola • <b>F/botão direito</b> faca</div>'+
+    '<div><b>Mouse</b> mirar • <b>P ou clique</b> atirar pistola</div>'+
+    '<div><b>F ou botão direito</b> facada</div>'+
     '<div><b>M</b> música • <b>R</b> reiniciar</div></div>'+
     '<div><button id="btnStart">COMEÇAR A MISSÃO</button></div>';
   overlay.classList.remove('hidden');
@@ -422,7 +423,7 @@ function update(dt){
   player.aim=Math.atan2(mouse.y-s.y,mouse.x-s.x);
   player.face=(mouse.x>=player.x)?1:-1;
   if(mx!==0&&Math.abs(mouse.x-player.x)<30)player.face=mx;
-  if(mouse.down&&shootCd<=0&&state==='playing'&&player.weapon==='pistol'){ shoot(); shootCd=0.21; }
+  if((mouse.down||keys['p'])&&shootCd<=0&&state==='playing'&&player.weapon==='pistol'){ shoot(); shootCd=0.21; }
 
   const cfg=genPhase(fase);
   if(state==='playing'){
