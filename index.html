@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Fazenda Apocalíptica SIDE-VIEW — 25 Fases + Bosses + Mercador v4.0</title>
+<title>Leon Policial — Fazenda & Colégio Helena v5.0</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { width:100%; height:100%; overflow:hidden; background:#0d0906;
@@ -254,7 +254,7 @@ function startPhase(n){
   state='playing';
   const cfg=genPhase(n);
   if(cfg.isBoss){ showToast('☠ FASE '+n+' — BOSS: '+BOSS_DEFS[n/5-1].nome+'!',3200); sfxBoss(); }
-  else showToast('FASE '+n+'/25 ['+diff().nome+'] — '+cfg.total+' zumbis!',2600);
+  else showToast('FASE '+n+'/25 ['+diff().nome+'] • '+localName()+' — '+cfg.total+' zumbis!',2800);
   updateHUD();
 }
 function showToast(msg,ms){ toast.textContent=msg; toast.style.display='block';
@@ -274,7 +274,8 @@ function showMenu(){
   cardMenu.innerHTML =
     '<div class="leon-badge">★ LEON POLICIAL — 25 FASES • v4.0 ★</div>'+
     '<h1>FAZENDA APOCALÍPTICA</h1>'+
-    '<p><b>25 fases</b>! Boss a cada 5 fases (5, 10, 15, 20, 25). <b>Mercador no fim de toda fase</b> com armas novas: 💥 Espingarda e 🔥 Submetralhadora!</p>'+
+    '<p><b>25 fases</b>! Boss a cada 5 fases. <b>Mercador no fim de toda fase</b> com 💥 Espingarda e 🔥 Submetralhadora!</p>'+
+    '<p>📍 <b>2 locais</b>: fases 1-10 <b>Fazenda Apocalíptica</b>, fases 11-20 <b>Colégio Helena</b> (prédio cinza com pilares laranja), 21-25 volta pra fazenda.</p>'+
     '<p>Escolha a dificuldade:</p><div class="diffRow">'+btns+'</div>'+
     '<p style="font-size:12px" id="diffDesc"></p>'+
     '<div class="keys"><div><b>A/D</b> correr • <b>W/Espaço</b> pular</div>'+
@@ -290,6 +291,18 @@ function showMenu(){
   cardMenu.querySelectorAll('.diffBtn').forEach(b=>b.onclick=()=>{ diffKey=b.dataset.d; audio(); beep(500,0.08,'square',0.06); showMenu(); });
   document.getElementById('btnStart').onclick=()=>{ audio(); if(musicOn)startMusic(); startGame(); };
 }
+
+// ---------- LOCAIS (fases higher alternate entre os dois cenários) ----------
+const LOCAIS = {
+  fazenda:{ nome:'FAZENDA APOCALÍPTICA', key:'fazenda' },
+  colegio:{ nome:'COLÉGIO HELENA', key:'colegio' },
+};
+// fases 1-10 fazenda, 11-20 colégio, 21-25 fazenda (vice-versa se mudar)
+function localKey(){
+  const n = fase||1;
+  return (n>10 && n<=20) ? 'colegio' : 'fazenda';
+}
+function localName(){ return LOCAIS[localKey()].nome; }
 
 // ---------- MERCADOR (fase 10+) ----------
 const SHOP=[
@@ -524,7 +537,8 @@ function update(dt){
 }
 
 // ---------- FUNDO ----------
-function drawBackground(t){
+// ============ CENÁRIO 1: FAZENDA APOCALÍPTICA ============
+function drawFazendaScene(t){
   const gy=groundY();
   // fase mais alta = céu mais vermelho e ameaçador
   const f=fase/TOTAL;
@@ -711,16 +725,171 @@ function drawBackground(t){
   ctx.beginPath(); ctx.moveTo(W*0.46,gy); ctx.lineTo(W*0.46,gy-58); ctx.stroke();
   ctx.lineWidth=2.5;
   for(let pr=-1;pr<=1;pr++){ ctx.beginPath(); ctx.moveTo(W*0.46+pr*6,gy-58); ctx.lineTo(W*0.46+pr*6,gy-72); ctx.stroke(); }
+}
+// ============ CENÁRIO 2: COLÉGIO HELENA (prédio cinza + pilares laranja) ============
+function drawColegioScene(t){
+  const gy=groundY(), f=fase/TOTAL;
+  // céu mais frio e morto que a fazenda
+  const ceu=ctx.createLinearGradient(0,0,0,gy);
+  ceu.addColorStop(0,'#070910'); ceu.addColorStop(0.4,'#1d2230');
+  ceu.addColorStop(0.72,'#4a3b3a'); ceu.addColorStop(1,'#8a5a3a');
+  ctx.fillStyle=ceu; ctx.fillRect(0,0,W,gy+2);
+  for(let i=0;i<28;i++){ const tx2=(i*197.3)%W, ty2=(i*89.7)%(H*0.14);
+    ctx.globalAlpha=0.12+0.18*Math.abs(Math.sin(t*1.2+i)); ctx.fillStyle='#cfe4ff'; ctx.fillRect(tx2,ty2,2,2); }
+  ctx.globalAlpha=1;
+  // lua fria atrás do prédio
+  const sx=W*0.78, sy=gy-190;
+  const mg=ctx.createRadialGradient(sx,sy,10,sx,sy,150);
+  mg.addColorStop(0,'rgba(220,230,255,.5)'); mg.addColorStop(1,'rgba(150,170,220,0)');
+  ctx.fillStyle=mg; ctx.beginPath(); ctx.arc(sx,sy,150,0,7); ctx.fill();
+  ctx.fillStyle='#e6ecff'; ctx.beginPath(); ctx.arc(sx,sy,34,0,7); ctx.fill();
+  ctx.fillStyle='rgba(150,160,190,.55)';
+  ctx.beginPath(); ctx.arc(sx-11,sy-8,7,0,7); ctx.fill();
+  ctx.beginPath(); ctx.arc(sx+9,sy+11,9,0,7); ctx.fill();
+  ctx.beginPath(); ctx.arc(sx+14,sy-12,5,0,7); ctx.fill();
+  // nuvens carregadas
+  for(let i=0;i<6;i++){ const cx=((i*W/5)+t*11*(1+i*0.14))%(W+340)-170;
+    const cy=H*0.11+(i%3)*34;
+    ctx.fillStyle='rgba(24,26,34,.8)';
+    ctx.beginPath(); ctx.ellipse(cx,cy,140,22,0,0,7); ctx.fill();
+    ctx.fillStyle='rgba(255,140,80,.18)';
+    ctx.beginPath(); ctx.ellipse(cx,cy+13,120,7,0,0,7); ctx.fill(); }
+  // cidade morta ao fundo
+  for(let i=0;i<16;i++){ const bw2=34+((i*53)%40), bx2=i*(W/15)-20, bh2=50+((i*79)%90);
+    ctx.fillStyle='#171a22'; ctx.fillRect(bx2,gy-30-bh2,bw2,bh2+30);
+    ctx.fillStyle='rgba(255,170,90,'+(0.08+0.14*((i*31)%5)/5)+')';
+    for(let wI=0;wI<3;wI++)ctx.fillRect(bx2+6+wI*10,gy-24-bh2+((wI*23)%30),5,7); }
+  // ============ PRÉDIO: CINZA COM PILARES LARANJAS ============
+  const bX=W*0.10, bW=Math.min(720,W*0.74), bH=Math.min(240,gy*0.62), bY=gy-bH;
+  ctx.fillStyle='rgba(0,0,0,.45)'; ctx.beginPath(); ctx.ellipse(bX+bW/2,gy+5,bW*0.56,12,0,0,7); ctx.fill();
+  const wall=ctx.createLinearGradient(0,bY,0,gy);
+  wall.addColorStop(0,'#7b7f86'); wall.addColorStop(0.45,'#5f636a'); wall.addColorStop(1,'#3f4348');
+  ctx.fillStyle=wall; ctx.fillRect(bX,bY,bW,bH);
+  ctx.fillStyle='rgba(0,0,0,.12)';
+  for(let i=0;i<Math.floor(bW/46);i++) ctx.fillRect(bX+i*46,bY,2,bH);
+  ctx.fillStyle='rgba(255,255,255,.07)';
+  for(let i=0;i<Math.floor(bH/40);i++) ctx.fillRect(bX,bY+i*40,bW,1);
+  // manchas de umidade
+  for(let i=0;i<10;i++){ const mx0=bX+((i*167)%bW), mw=20+((i*29)%60);
+    ctx.fillStyle='rgba(20,18,16,'+(0.10+0.12*((i*13)%3)/3)+')';
+    ctx.beginPath(); ctx.ellipse(mx0,bY+((i*83)%bH),mw,16+((i*41)%26),0,0,7); ctx.fill(); }
+  // platibanda
+  ctx.fillStyle='#4a4e55'; ctx.fillRect(bX-10,bY-16,bW+20,18);
+  ctx.fillStyle='rgba(255,255,255,.12)'; ctx.fillRect(bX-10,bY-16,bW+20,3);
+  ctx.fillStyle='#33373d'; ctx.fillRect(bX+18,bY-30,bW-36,16);
+  // letreiro ESCOLINHA HELENA piscando
+  const lgY=bY-46;
+  ctx.fillStyle='#22262d'; ctx.fillRect(bX+bW*0.26,lgY,bW*0.48,30);
+  ctx.strokeStyle='#e07b1e'; ctx.lineWidth=2; ctx.strokeRect(bX+bW*0.26,lgY,bW*0.48,30);
+  const flick=0.55+0.45*Math.abs(Math.sin(t*7));
+  ctx.fillStyle='rgba(255,150,40,'+(0.55+0.45*flick)+')';
+  ctx.font='bold 15px Arial'; ctx.textAlign='center';
+  ctx.fillText('ESCOLINHA HELENA',bX+bW*0.5,lgY+21);
+  ctx.fillStyle='rgba(255,190,120,'+(0.25*flick)+')';
+  ctx.fillRect(bX+bW*0.26,lgY,bW*0.48,30);
+  // portico com pilares laranja
+  const pY=bY+bH*0.30, pH=gy-pY;
+  const nP=5, pW=Math.max(16,bW*0.035);
+  for(let i=0;i<nP;i++){
+    const px0=bX+bW*(0.06+i*(0.88/(nP-1)));
+    ctx.fillStyle='rgba(0,0,0,.3)'; ctx.fillRect(px0+4,pY,pW,pH);
+    const pg=ctx.createLinearGradient(px0,0,px0+pW,0);
+    pg.addColorStop(0,'#a8471a'); pg.addColorStop(0.4,'#e07b1e'); pg.addColorStop(1,'#8c3a12');
+    ctx.fillStyle=pg; ctx.fillRect(px0,pY,pW,pH);
+    ctx.fillStyle='rgba(255,255,255,.18)'; ctx.fillRect(px0+2,pY,3,pH);
+    ctx.fillStyle='#f0912c'; ctx.fillRect(px0-4,pY-10,pW+8,12);
+    ctx.fillStyle='#f0912c'; ctx.fillRect(px0-4,gy-12,pW+8,12);
+    ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(px0+pW*0.4,pY+16); ctx.lineTo(px0+pW*0.7,pY+40);
+    ctx.lineTo(px0+pW*0.3,pY+62); ctx.stroke();
+  }
+  // sagão escuro entre pilares
+  ctx.fillStyle='#0c0e12'; ctx.fillRect(bX+bW*0.10,pY+10,bW*0.80,pH-10);
+  ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fillRect(bX+bW*0.10,pY+10,bW*0.80,6);
+  for(let i=0;i<8;i++){ const rx=bX+bW*0.12+((i*97)%(bW*0.76)), rh=8+((i*31)%18);
+    ctx.fillStyle='#4c5057';
+    ctx.beginPath(); ctx.moveTo(rx,gy-2); ctx.lineTo(rx+12,gy-2); ctx.lineTo(rx+6,gy-2-rh); ctx.closePath(); ctx.fill(); }
+  // janelas quebradas em fileira
+  const wY=bY+18, wH=bH*0.24;
+  for(let i=0;i<7;i++){
+    const wx0=bX+bW*(0.05+i*0.14), ww=bW*0.10;
+    ctx.fillStyle='#111419'; ctx.fillRect(wx0,wY,ww,wH);
+    ctx.strokeStyle='#6a6e75'; ctx.lineWidth=2; ctx.strokeRect(wx0,wY,ww,wH);
+    const broken=((i*37)%3)!==0;
+    ctx.fillStyle='rgba(255,170,80,'+(broken?0.5:0.12)+')';
+    ctx.fillRect(wx0+2,wY+2,ww-4,wH-4);
+    if(broken){ ctx.strokeStyle='rgba(20,20,24,.9)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(wx0+3,wY+3); ctx.lineTo(wx0+ww-3,wY+wH-3); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(wx0+ww-3,wY+3); ctx.lineTo(wx0+3,wY+wH-3); ctx.stroke(); }
+    else { ctx.fillStyle='rgba(10,12,16,.85)'; ctx.fillRect(wx0+2,wY+2,ww-4,wH-4); }
+  }
+  // relógio quebrado
+  const clkX=bX+bW*0.85, clkY=bY-6;
+  ctx.fillStyle='#3d4147'; ctx.beginPath(); ctx.arc(clkX,clkY,16,0,7); ctx.fill();
+  ctx.fillStyle='#d8d2c4'; ctx.beginPath(); ctx.arc(clkX,clkY,13,0,7); ctx.fill();
+  ctx.strokeStyle='#22252a'; ctx.lineWidth=2; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(clkX,clkY); ctx.lineTo(clkX,clkY-8); ctx.stroke();
+  ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(clkX,clkY); ctx.lineTo(clkX+6,clkY+4); ctx.stroke();
+  ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(clkX-11,clkY+6); ctx.lineTo(clkX+2,clkY-11); ctx.stroke();
+  // árvores mortas na frente
+  function arvoreM(x,s){ ctx.strokeStyle='#0f0d0b'; ctx.lineCap='round'; ctx.lineWidth=6*s;
+    ctx.beginPath(); ctx.moveTo(x,gy); ctx.quadraticCurveTo(x-5*s,gy-40*s,x+6*s,gy-80*s); ctx.stroke();
+    ctx.lineWidth=3*s;
+    ctx.beginPath(); ctx.moveTo(x+3*s,gy-52*s); ctx.quadraticCurveTo(x-20*s,gy-72*s,x-28*s,gy-100*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+5*s,gy-66*s); ctx.quadraticCurveTo(x+24*s,gy-82*s,x+32*s,gy-104*s); ctx.stroke(); }
+  arvoreM(W*0.90,1); arvoreM(W*0.035,0.7);
+  // asfalto
+  const chao=ctx.createLinearGradient(0,gy,0,H);
+  chao.addColorStop(0,'#3a3d42'); chao.addColorStop(0.3,'#2a2c30'); chao.addColorStop(1,'#131416');
+  ctx.fillStyle=chao; ctx.fillRect(0,gy,W,H-gy);
+  ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fillRect(0,gy,W,2);
+  ctx.fillStyle='rgba(240,220,150,.28)';
+  for(let i=0;i<9;i++) ctx.fillRect(i*(W/8)+12,gy+26,54,5);
+  ctx.strokeStyle='rgba(255,255,255,.10)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,gy+18); ctx.lineTo(W,gy+18); ctx.stroke();
+  ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.lineWidth=2;
+  for(let i=0;i<7;i++){ const cx0=(i*233)%W, cy0=gy+20+((i*59)%(H-gy-26));
+    ctx.beginPath(); ctx.moveTo(cx0,cy0);
+    ctx.lineTo(cx0+30,cy0+6); ctx.lineTo(cx0+56,cy0-5); ctx.lineTo(cx0+90,cy0+8); ctx.stroke(); }
+  // carteiras tombadas (nada de círculo brilhante no chão)
+  function carteira(x,s){ ctx.save(); ctx.translate(x,gy-4); ctx.rotate(-0.3);
+    ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(-14*s,-3*s,30*s,6*s);
+    ctx.fillStyle='#7a5a2e'; ctx.fillRect(-13*s,-10*s,26*s,6*s);
+    ctx.fillStyle='#5f4522'; ctx.fillRect(-13*s,-14*s,26*s,4*s);
+    ctx.strokeStyle='#3a2a12'; ctx.lineWidth=1.5; ctx.beginPath();
+    ctx.moveTo(-13*s,-8*s); ctx.lineTo(13*s,-8*s); ctx.stroke();
+    ctx.restore(); }
+  carteira(W*0.22,1); carteira(W*0.68,0.9); carteira(W*0.86,1.05);
+  // postes com facho
+  function poste(x){ ctx.strokeStyle='#2a2d33'; ctx.lineWidth=6;
+    ctx.beginPath(); ctx.moveTo(x,gy); ctx.lineTo(x,gy-120); ctx.stroke();
+    ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(x,gy-120); ctx.lineTo(x+18,gy-124); ctx.stroke();
+    ctx.fillStyle='#3a3e45'; ctx.fillRect(x+12,gy-126,16,7);
+    ctx.fillStyle='rgba(255,190,110,.16)';
+    ctx.beginPath(); ctx.moveTo(x+20,gy-118); ctx.lineTo(x+58,gy); ctx.lineTo(x-18,gy); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='rgba(255,205,140,.85)'; ctx.fillRect(x+14,gy-120,12,3); }
+  poste(W*0.16); poste(W*0.72);
+}
+// ============ ESCOLHE O CENÁRIO DA FASE + EFEITOS COMUNS ============
+function drawBackground(t){
+  if(localKey()==='colegio') drawColegioScene(t);
+  else drawFazendaScene(t);
   for(const e of embers){ ctx.fillStyle='rgba(255,'+Math.floor(120+Math.random()*80)+',40,.8)';
     ctx.beginPath(); ctx.arc(e.x,e.y,e.s,0,7); ctx.fill(); }
   const vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.75);
   vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.55)');
   ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
-  // marca d'água boss
   if(genPhase(fase||1).isBoss&&state==='playing'){
     ctx.fillStyle='rgba(255,40,40,.75)'; ctx.font='bold 15px Arial'; ctx.textAlign='center';
     ctx.fillText('☠ FASE DE BOSS ☠',W/2,96);
   }
+  // placa do local atual
+  ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(8,8,ctx.measureText(localName()).width+150,26);
+  ctx.fillStyle=localKey()==='colegio'?'#f0912c':'#c98a3a';
+  ctx.font='bold 13px Arial'; ctx.textAlign='left';
+  ctx.fillText(localName(),16,26);
 }
 
 // ---------- LEON ----------
